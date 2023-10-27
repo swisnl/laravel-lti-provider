@@ -1,24 +1,27 @@
 {
-    "name": ":vendor_slug/:package_slug",
-    "description": ":package_description",
+    "name": "swisnl/laravel-lti-provider",
+    "type": "library",
+    "description": "Laravel lti provider",
     "keywords": [
-        ":vendor_name",
-        "laravel",
-        ":package_slug"
+        "swisnl",
+        "laravel-lti"
     ],
-    "homepage": "https://github.com/:vendor_slug/:package_slug",
+    "homepage": "https://github.com/swisnl/laravel-lti-provider",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com",
+            "name": "Thomas Wijnands",
+            "email": "twijnands@swis.nl",
+            "homepage": "https://www.swis.nl",
             "role": "Developer"
         }
     ],
     "require": {
         "php": "^8.1",
-        "spatie/laravel-package-tools": "^1.14.0",
-        "illuminate/contracts": "^10.0"
+        "laravel/framework": "^10.0",
+        "spatie/laravel-package-tools": "^1.15",
+        "illuminate/contracts": "^10.0",
+        "celtic/lti": "^5.0"
     },
     "require-dev": {
         "laravel/pint": "^1.0",
@@ -35,14 +38,7 @@
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src/",
-            "VendorName\\Skeleton\\Database\\Factories\\": "database/factories/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests/",
-            "Workbench\\App\\": "workbench/app/"
+            "Swis\\Laravel\\LtiProvider\\": "src"
         }
     },
     "scripts": {
@@ -63,21 +59,19 @@
         "test-coverage": "vendor/bin/pest --coverage",
         "format": "vendor/bin/pint"
     },
-    "config": {
-        "sort-packages": true,
-        "allow-plugins": {
-            "pestphp/pest-plugin": true,
-            "phpstan/extension-installer": true
-        }
-    },
     "extra": {
         "laravel": {
             "providers": [
-                "VendorName\\Skeleton\\SkeletonServiceProvider"
-            ],
-            "aliases": {
-                "Skeleton": "VendorName\\Skeleton\\Facades\\Skeleton"
-            }
+                "Swis\\Laravel\\LtiProvider\\LtiServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "phpstan/extension-installer": true,
+            "pestphp/pest-plugin": true
         }
     },
     "minimum-stability": "dev",
