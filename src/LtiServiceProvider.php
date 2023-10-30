@@ -14,10 +14,12 @@ class LtiServiceProvider extends \Spatie\LaravelPackageTools\PackageServiceProvi
         $package
             ->name('swis-laravel-lti-provider')
             ->hasMigration('2023_10_26_100000_add_client_and_lti_tables')
+            ->publishesServiceProvider('LtiServiceProvider')
             ->runsMigrations()
             ->hasInstallCommand(function (InstallCommand $command) {
                 $command
-                    ->publishConfigFile()
+                    ->publishMigrations()
+                    ->askToRunMigrations()
                     ->askToStarRepoOnGitHub('swisnl/laravel-lti-provider');
             });
     }
