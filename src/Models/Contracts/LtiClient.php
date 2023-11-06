@@ -19,22 +19,22 @@ interface LtiClient
     public function fillFromLtiPlatform(Platform $platform): void;
 
     /**
-     * @return HasMany<\Swis\Laravel\LtiProvider\Models\LtiResourceLink>
+     * @return HasMany<\Illuminate\Database\Eloquent\Model>
      */
     public function resourceLinks(): HasMany;
 
     /**
-     * @return HasMany<\Swis\Laravel\LtiProvider\Models\LtiContext>
+     * @return HasMany<\Illuminate\Database\Eloquent\Model>
      */
     public function contexts(): HasMany;
 
     /**
-     * @return HasMany<\Swis\Laravel\LtiProvider\Models\LtiNonce>
+     * @return HasMany<\Illuminate\Database\Eloquent\Model>
      */
     public function nonces(): HasMany;
 
     /**
-     * @return HasMany<\Swis\Laravel\LtiProvider\Models\LtiAccessToken>
+     * @return HasMany<\Illuminate\Database\Eloquent\Model>
      */
     public function accessTokens(): HasMany;
 }

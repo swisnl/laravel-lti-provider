@@ -8,20 +8,21 @@ use ceLTIc\LTI\Enum\IdScope;
 use ceLTIc\LTI\UserResult;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Swis\Laravel\LtiProvider\Models\Contracts\LtiUserResult as LtiUserResultInterface;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 
 /**
  * \Swis\Laravel\LtiProvider\Models\LtiUserResult.
  *
- * @property int                                             $id
- * @property string                                          $lti_environment_type
- * @property string                                          $lti_environment_id
- * @property int                                             $lti_resource_link_id
- * @property string                                          $external_user_id
- * @property string                                          $external_user_result_id
- * @property \Illuminate\Support\Carbon|null                 $created_at
- * @property \Illuminate\Support\Carbon|null                 $updated_at
- * @property \Illuminate\Database\Eloquent\Model|\Eloquent   $ltiEnvironment
+ * @property int                                              $id
+ * @property string                                           $lti_environment_type
+ * @property string                                           $lti_environment_id
+ * @property int                                              $lti_resource_link_id
+ * @property string                                           $external_user_id
+ * @property string                                           $external_user_result_id
+ * @property \Illuminate\Support\Carbon|null                  $created_at
+ * @property \Illuminate\Support\Carbon|null                  $updated_at
+ * @property \Illuminate\Database\Eloquent\Model              $ltiEnvironment
  * @property \Swis\Laravel\LtiProvider\Models\LtiResourceLink $resourceLink
  *
  * @method static \Illuminate\Database\Eloquent\Builder|LtiUserResult newModelQuery()
@@ -38,7 +39,7 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
  *
  * @mixin \Eloquent
  */
-class LtiUserResult extends Model
+class LtiUserResult extends Model implements LtiUserResultInterface
 {
     use HasLtiEnvironment;
 

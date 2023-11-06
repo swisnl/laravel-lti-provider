@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Swis\Laravel\LtiProvider\Models\Contracts\LtiClient;
+use Swis\Laravel\LtiProvider\Models\Contracts\LtiResourceLink as LtiResourceLinkAlias;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 
 /**
@@ -26,10 +26,9 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
  * @property \Illuminate\Database\Eloquent\Casts\ArrayObject                          $settings
  * @property \Illuminate\Support\Carbon|null                                          $created_at
  * @property \Illuminate\Support\Carbon|null                                          $updated_at
- * @property \Swis\Laravel\LtiProvider\Models\Contracts\LtiClient|null                 $client
- * @property \Swis\Laravel\LtiProvider\Models\LtiContext|null                          $context
- * @property \Illuminate\Database\Eloquent\Model|\Eloquent                            $ltiEnvironment
- * @property \Illuminate\Database\Eloquent\Collection<int, \App\Models\LtiUserResult> $userResults
+ * @property \Swis\Laravel\LtiProvider\Models\Contracts\LtiClient|null                $client
+ * @property \Swis\Laravel\LtiProvider\Models\LtiContext|null                         $context
+ * @property \Illuminate\Database\Eloquent\Model                                      $ltiEnvironment
  * @property int|null                                                                 $user_results_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder|LtiResourceLink newModelQuery()
@@ -48,7 +47,7 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
  *
  * @mixin \Eloquent
  */
-class LtiResourceLink extends Model
+class LtiResourceLink extends Model implements LtiResourceLinkAlias
 {
     use HasLtiEnvironment;
 
@@ -109,7 +108,7 @@ class LtiResourceLink extends Model
      */
     public function client(): BelongsTo
     {
-        return $this->belongsTo(app(LtiClient::class));
+        return $this->belongsTo(config('lti-provider.lti-client'));
     }
 
     /**

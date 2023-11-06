@@ -23,23 +23,32 @@ use Swis\Laravel\LtiProvider\Models\LtiUserResult;
 
 class ModelDataConnector extends DataConnector
 {
-    protected LtiEnvironment $environment;
+    protected Model $client;
 
-    public function __construct(LtiEnvironment $environment)
+    public function __construct(protected LtiEnvironment $environment)
     {
         parent::__construct((object) []);
-        $this->environment = $environment;
+
+        $client = config('lti-provider.lti-client');
+
+        if ($client === '') {
+            abort(500, 'please provide an lti client in the lti-provider config');
+        }
+
+        $client = new $client();
+
+        if (! $client instanceof LtiClient || ! $client instanceof Model) {
+            abort(500, 'Client must implement LtiClient interface');
+        }
+
+        $this->client = $client;
     }
 
     public function loadPlatform(Platform $platform): bool
     {
-        if (! app()->bound(LtiClient::class) || ! app(LtiClient::class) instanceof Model) {
-            return false;
-        }
-
         if (! empty($platform->getRecordId())) {
-            /** @var \Swis\Laravel\LtiProvider\Models\Contracts\LtiClient|null $client */
-            $client = app(LtiClient::class)::firstWhere('nr', $platform->getRecordId());
+            /** @var LtiClient|null $client */
+            $client = $this->client::firstWhere('nr', $platform->getRecordId());
             if (! $client) {
                 return false;
             }
@@ -50,7 +59,7 @@ class ModelDataConnector extends DataConnector
         }
 
         if (! empty($platform->platformId) || ! empty($platform->clientId) || ! empty($platform->deploymentId)) {
-            $query = app(LtiClient::class)::query();
+            $query = $this->client::query();
 
             if (! empty($platform->platformId)) {
                 $query->where('lti_platform_id', $platform->platformId);
@@ -62,7 +71,7 @@ class ModelDataConnector extends DataConnector
                 $query->where('lti_deployment_id', $platform->deploymentId);
             }
 
-            /** @var \Swis\Laravel\LtiProvider\Models\Contracts\LtiClient|null $client */
+            /** @var LtiClient|null $client */
             $client = $query->first();
             if (! $client) {
                 return false;
@@ -74,8 +83,8 @@ class ModelDataConnector extends DataConnector
         }
 
         if (! empty($platform->getKey())) {
-            /** @var \Swis\Laravel\LtiProvider\Models\Contracts\LtiClient|null $client */
-            $client = app(LtiClient::class)::find($platform->getKey());
+            /** @var LtiClient|null $client */
+            $client = $this->client::find($platform->getKey());
             if (! $client) {
                 return false;
             }
@@ -90,19 +99,10 @@ class ModelDataConnector extends DataConnector
 
     public function savePlatform(Platform $platform): bool
     {
-        if (! app()->bound(LtiClient::class)) {
-            return false;
-        }
-
-        $LtiClient = app(LtiClient::class);
-
-        if (! $LtiClient instanceof Model) {
-            return false;
-        }
-
         if (! empty($platform->getRecordId())) {
-            $client = $LtiClient::firstWhere('nr', $platform->getRecordId());
-            if (! $client || ! $client instanceof LtiClient) {
+            /** @var LtiClient|Model|null $client */
+            $client = $this->client::firstWhere('nr', $platform->getRecordId());
+            if (! $client) {
                 return false;
             }
 
@@ -129,18 +129,8 @@ class ModelDataConnector extends DataConnector
      */
     public function getPlatforms(): array
     {
-        if (! app()->bound(LtiClient::class)) {
-            return [];
-        }
-
-        $LtiClient = app(LtiClient::class);
-
-        if (! $LtiClient instanceof Model) {
-            return [];
-        }
-
         /** @var Collection<int,LtiClient> $clients. */
-        $clients = $LtiClient::all();
+        $clients = $this->client::all();
 
         return $clients->map(function (LtiClient $client) {
             $platform = new Platform($this);
@@ -330,18 +320,20 @@ class ModelDataConnector extends DataConnector
      */
     public function getUserResultSourcedIDsResourceLink(ResourceLink $resourceLink, bool $localOnly, ?IdScope $idScope): array
     {
+        /** @var Collection<int,LtiUserResult> $userResults */
         $userResults = $this->environment->userResults()->where('lti_resource_link_id', $resourceLink->getRecordId())
-            ->get()->values()->map(function (LtiUserResult $ltiUserResult) use ($resourceLink) {
-                $userResult = new UserResult();
+            ->get()->values();
+        $userResults = $userResults->map(function (LtiUserResult $ltiUserResult) use ($resourceLink) {
+            $userResult = new UserResult();
 
-                $userResult->setDataConnector($this);
-                $userResult->setResourceLinkId($resourceLink->getRecordId());
-                $userResult->setResourceLink($resourceLink);
+            $userResult->setDataConnector($this);
+            $userResult->setResourceLinkId($resourceLink->getRecordId());
+            $userResult->setResourceLink($resourceLink);
 
-                $ltiUserResult->fillLtiUserResult($userResult);
+            $ltiUserResult->fillLtiUserResult($userResult);
 
-                return $userResult;
-            });
+            return $userResult;
+        });
 
         if (! is_null($idScope)) {
             return $userResults->mapWithKeys(function (UserResult $userResult) use ($idScope) {

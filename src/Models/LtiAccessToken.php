@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
-use Swis\Laravel\LtiProvider\Models\Contracts\LtiClient;
+use Swis\Laravel\LtiProvider\Models\Contracts\LtiAccessToken as LtiAccessTokenAlias;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 
 /**
@@ -42,7 +42,7 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
  *
  * @mixin \Eloquent
  */
-class LtiAccessToken extends Model
+class LtiAccessToken extends Model implements LtiAccessTokenAlias
 {
     use HasLtiEnvironment;
     use HasUuids;
@@ -71,7 +71,7 @@ class LtiAccessToken extends Model
      */
     public function client(): BelongsTo
     {
-        return $this->belongsTo(app(LtiClient::class));
+        return $this->belongsTo(config('lti-provider.lti-client'));
     }
 
     public function fillLtiAccessToken(AccessToken $accessToken): void

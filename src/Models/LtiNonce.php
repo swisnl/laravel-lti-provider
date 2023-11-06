@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Swis\Laravel\LtiProvider\Models\Contracts\LtiNonce as LtiNonceInterface;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 
 /**
@@ -39,7 +40,7 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
  *
  * @mixin \Eloquent
  */
-class LtiNonce extends Model
+class LtiNonce extends Model implements LtiNonceInterface
 {
     use HasLtiEnvironment;
     use HasUuids;

@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Swis\Laravel\LtiProvider\Models\Contracts\LtiClient;
+use Swis\Laravel\LtiProvider\Models\Contracts\LtiContext as LtiContextInterface;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 
 /**
@@ -45,7 +45,7 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
  *
  * @mixin \Eloquent
  */
-class LtiContext extends Model
+class LtiContext extends Model implements LtiContextInterface
 {
     use HasLtiEnvironment;
 
@@ -92,7 +92,7 @@ class LtiContext extends Model
      */
     public function client(): BelongsTo
     {
-        return $this->belongsTo(app(LtiClient::class));
+        return $this->belongsTo(config('lti-provider.lti-client'));
     }
 
     /**
