@@ -38,7 +38,7 @@ return new class() extends Migration
             $table->string('lti_signature_method', 15)->default('HMAC-SHA1');
             $table->text('lti_profile');
             $table->text('lti_settings');
-            $table->string('lti_user_type')->default('external_user')->after('lti_settings');
+            $table->string('lti_user_type')->default('external_user');
 
             $table->timestamps();
 
