@@ -7,7 +7,7 @@ use Swis\Laravel\LtiProvider\Models\LtiNonce;
 
 class DeleteExpiredLtiNonces extends Command
 {
-    protected $signature = 'lti:delete-expired-nonce';
+    protected $signature = 'lti:delete-expired-nonces';
 
     protected $description = 'Cleanup the expired LTI nonces from the database';
 
@@ -15,6 +15,6 @@ class DeleteExpiredLtiNonces extends Command
     {
         LtiNonce::deleteExpired();
 
-        return Command::SUCCESS;
+        return static::SUCCESS;
     }
 }

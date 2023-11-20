@@ -11,46 +11,12 @@ return new class() extends Migration
      */
     public function up(): void
     {
-        Schema::create('clients', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->integer('nr')->unique();
-
-            // Admin title
-            $table->string('name');
-
-            // Keys & secrets
-            $table->string('secret', 1024)->nullable();
-            $table->text('public_key')->nullable();
-
-            // Branding
-            $table->text('redirect');
-            $table->string('home_url')->nullable();
-            $table->string('logo')->nullable();
-
-            // Policies
-            $table->boolean('revoked')->default(false);
-
-            // LTI information
-            $table->string('lti_platform_id', 255)->nullable();
-            $table->string('lti_client_id', 255)->nullable();
-            $table->string('lti_deployment_id', 255)->nullable();
-            $table->string('lti_version', 10)->nullable();
-            $table->string('lti_signature_method', 15)->default('HMAC-SHA1');
-            $table->text('lti_profile');
-            $table->text('lti_settings');
-            $table->string('lti_user_type')->default('external_user');
-
-            $table->timestamps();
-
-            $table->unique(['lti_platform_id', 'lti_client_id', 'lti_deployment_id']);
-        });
-
         Schema::create('lti_nonces', function (Blueprint $table) {
             $table->uuid('id')->primary();
 
             $table->uuidMorphs('lti_environment');
 
-            $table->foreignUuid('client_id')->constrained('clients')->cascadeOnDelete();
+            $table->uuid('client_id');
             $table->string('nonce', 50);
             $table->dateTime('expires_at');
 
@@ -64,7 +30,7 @@ return new class() extends Migration
 
             $table->uuidMorphs('lti_environment');
 
-            $table->foreignUuid('client_id')->unique()->constrained('clients')->cascadeOnDelete();
+            $table->uuid('client_id')->unique();
 
             $table->string('access_token', 2000);
             $table->text('scopes');
@@ -78,7 +44,7 @@ return new class() extends Migration
 
             $table->uuidMorphs('lti_environment');
 
-            $table->foreignUuid('client_id')->constrained('clients')->cascadeOnDelete();
+            $table->uuid('client_id');
             $table->string('title')->nullable();
             $table->string('external_context_id', 255);
             $table->text('settings');
@@ -91,7 +57,7 @@ return new class() extends Migration
 
             $table->uuidMorphs('lti_environment');
 
-            $table->foreignUuid('client_id')->nullable()->constrained('clients')->cascadeOnDelete();
+            $table->uuid('client_id');
             $table->foreignId('lti_context_id')->nullable()->constrained('lti_contexts')->cascadeOnDelete();
 
             $table->string('title')->nullable();
@@ -125,6 +91,5 @@ return new class() extends Migration
         Schema::drop('lti_contexts');
         Schema::drop('lti_access_tokens');
         Schema::drop('lti_nonces');
-        Schema::drop('clients');
     }
 };

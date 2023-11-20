@@ -14,6 +14,7 @@ use ceLTIc\LTI\ResourceLink;
 use ceLTIc\LTI\ResourceLinkShareKey;
 use ceLTIc\LTI\Tool;
 use ceLTIc\LTI\UserResult;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -21,34 +22,35 @@ use Swis\Laravel\LtiProvider\Models\Contracts\LtiClient;
 use Swis\Laravel\LtiProvider\Models\Contracts\LtiEnvironment;
 use Swis\Laravel\LtiProvider\Models\LtiUserResult;
 
+/** @phpstan-consistent-constructor */
 class ModelDataConnector extends DataConnector
 {
-    protected Model $client;
+    protected LtiEnvironment $environment;
 
-    public function __construct(protected LtiEnvironment $environment)
+    /** @var class-string<Model&LtiClient> */
+    protected string $clientClassName;
+
+    public function __construct(LtiEnvironment $environment, string $clientClassName)
     {
         parent::__construct((object) []);
 
-        $client = config('lti-provider.lti-client');
+        $this->environment = $environment;
+        $this->clientClassName = $clientClassName;
+    }
 
-        if ($client === '') {
-            abort(500, 'please provide an lti client in the lti-provider config');
-        }
-
-        $client = new $client();
-
-        if (! $client instanceof LtiClient || ! $client instanceof Model) {
-            abort(500, 'Client must implement LtiClient interface');
-        }
-
-        $this->client = $client;
+    /**
+     * @return \Illuminate\Database\Eloquent\Builder<Model&LtiClient>
+     */
+    protected function getClientBuilder(): Builder
+    {
+        return $this->clientClassName::query();
     }
 
     public function loadPlatform(Platform $platform): bool
     {
         if (! empty($platform->getRecordId())) {
             /** @var LtiClient|null $client */
-            $client = $this->client::firstWhere('nr', $platform->getRecordId());
+            $client = $this->getClientBuilder()->firstWhere('nr', $platform->getRecordId());
             if (! $client) {
                 return false;
             }
@@ -59,7 +61,7 @@ class ModelDataConnector extends DataConnector
         }
 
         if (! empty($platform->platformId) || ! empty($platform->clientId) || ! empty($platform->deploymentId)) {
-            $query = $this->client::query();
+            $query = $this->getClientBuilder();
 
             if (! empty($platform->platformId)) {
                 $query->where('lti_platform_id', $platform->platformId);
@@ -84,7 +86,7 @@ class ModelDataConnector extends DataConnector
 
         if (! empty($platform->getKey())) {
             /** @var LtiClient|null $client */
-            $client = $this->client::find($platform->getKey());
+            $client = $this->getClientBuilder()->find($platform->getKey());
             if (! $client) {
                 return false;
             }
@@ -100,8 +102,8 @@ class ModelDataConnector extends DataConnector
     public function savePlatform(Platform $platform): bool
     {
         if (! empty($platform->getRecordId())) {
-            /** @var LtiClient|Model|null $client */
-            $client = $this->client::firstWhere('nr', $platform->getRecordId());
+            /** @var (LtiClient&Model)|null $client */
+            $client = $this->getClientBuilder()->firstWhere('nr', $platform->getRecordId());
             if (! $client) {
                 return false;
             }
@@ -130,7 +132,7 @@ class ModelDataConnector extends DataConnector
     public function getPlatforms(): array
     {
         /** @var Collection<int,LtiClient> $clients. */
-        $clients = $this->client::all();
+        $clients = $this->getClientBuilder()->get();
 
         return $clients->map(function (LtiClient $client) {
             $platform = new Platform($this);
@@ -541,5 +543,27 @@ class ModelDataConnector extends DataConnector
     public function getTools(): array
     {
         throw new \Exception('getTools not implemented');
+    }
+
+    public static function make(LtiEnvironment $environment): static
+    {
+        $clientClassName = config('lti-provider.class-names.lti-client');
+        if ($clientClassName === '') {
+            abort(500, 'please provide an lti client in the lti-provider config');
+        }
+
+        if (! class_exists($clientClassName)) {
+            abort(500, 'Lti client class does not exist');
+        }
+
+        if (! is_subclass_of($clientClassName, Model::class)) {
+            abort(500, 'Lti client class must be a subclass of '.Model::class);
+        }
+
+        if (! is_subclass_of($clientClassName, LtiClient::class)) {
+            abort(500, 'Lti client class must be an implementation of '.LtiClient::class);
+        }
+
+        return new static($environment, $clientClassName);
     }
 }

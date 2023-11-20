@@ -22,7 +22,7 @@ Run
 ```bash
 php artisan lti-service-provider:install
 ```
-implemnent the LtiClient interface to your oauth2 client model. Implement the methods and add the required attributes
+Implement the LtiClient interface to your oauth2 client model. Implement the methods and add the required attributes
 
 ## Change log
 

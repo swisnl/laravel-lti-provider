@@ -7,48 +7,40 @@ namespace Swis\Laravel\LtiProvider\Models;
 use ceLTIc\LTI\AccessToken;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
-use Swis\Laravel\LtiProvider\Models\Contracts\LtiAccessToken as LtiAccessTokenAlias;
+use Swis\Laravel\LtiProvider\Models\Traits\HasLtiClient;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 
 /**
  * \Swis\Laravel\LtiProvider\Models\LtiAccessToken.
  *
- * @property string                                              $id
- * @property string                                              $lti_environment_type
- * @property string                                              $lti_environment_id
- * @property string                                              $client_id
- * @property string                                              $access_token
- * @property array                                               $scopes
- * @property \Illuminate\Support\Carbon                          $expires_at
- * @property \Illuminate\Support\Carbon|null                     $created_at
- * @property \Illuminate\Support\Carbon|null                     $updated_at
- * @property \Swis\Laravel\LtiProvider\Models\Contracts\LtiClient $client
- * @property \Illuminate\Database\Eloquent\Model|\Eloquent       $ltiEnvironment
+ * @property string                                                                                   $id
+ * @property string                                                                                   $access_token
+ * @property array                                                                                    $scopes
+ * @property \Illuminate\Support\Carbon                                                               $expires_at
+ * @property \Illuminate\Support\Carbon|null                                                          $created_at
+ * @property \Illuminate\Support\Carbon|null                                                          $updated_at
  *
  * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken query()
  * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken whereAccessToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken whereClientId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken whereExpiresAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken whereLtiEnvironmentId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken whereLtiEnvironmentType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken whereScopes($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken whereUpdatedAt($value)
- *
- * @mixin \Eloquent
  */
-class LtiAccessToken extends Model implements LtiAccessTokenAlias
+class LtiAccessToken extends Model
 {
+    use HasLtiClient;
     use HasLtiEnvironment;
     use HasUuids;
 
     protected $fillable = [
         'client_id',
+        'lti_environment_type',
+        'lti_environment_id',
         'access_token',
         'scopes',
         'expires_at',
@@ -65,14 +57,6 @@ class LtiAccessToken extends Model implements LtiAccessTokenAlias
     protected $attributes = [
         'scopes' => '[]',
     ];
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Illuminate\Database\Eloquent\Model, self>
-     */
-    public function client(): BelongsTo
-    {
-        return $this->belongsTo(config('lti-provider.lti-client'));
-    }
 
     public function fillLtiAccessToken(AccessToken $accessToken): void
     {
