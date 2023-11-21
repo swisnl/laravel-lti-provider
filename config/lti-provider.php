@@ -2,7 +2,7 @@
 
 return [
     'class-names' => [
-        'lti-client' => '',
+        'lti-client' => \Swis\Laravel\LtiProvider\Models\SimpleClient::class,
         'lti-context' => \Swis\Laravel\LtiProvider\Models\LtiContext::class,
         'lti-resource-link' => \Swis\Laravel\LtiProvider\Models\LtiResourceLink::class,
         'lti-nonce' => \Swis\Laravel\LtiProvider\Models\LtiNonce::class,
