@@ -12,7 +12,7 @@ return new class() extends Migration
     public function up(): void
     {
         Schema::create('simple_lti_environments', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
 
             // Admin title
             $table->string('name');

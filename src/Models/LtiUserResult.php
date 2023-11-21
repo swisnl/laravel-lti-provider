@@ -11,8 +11,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 
 /**
- * \Swis\Laravel\LtiProvider\Models\LtiUserResult.
- *
  * @property int                                              $id
  * @property int                                              $lti_resource_link_id
  * @property string                                           $external_user_id
@@ -34,6 +32,8 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 class LtiUserResult extends Model
 {
     use HasLtiEnvironment;
+
+    protected $table = 'lti_user_results';
 
     protected $fillable = [
         'lti_environment_type',

@@ -171,10 +171,10 @@ class ModelDataConnector extends DataConnector
 
         if (! empty($context->ltiContextId)) {
             /** @var \Swis\Laravel\LtiProvider\Models\LtiContext|null $ltiContext */
-            $ltiContext = $this->environment->contexts()->with('client')->where('external_context_id', $context->ltiContextId)
-                ->whereHas('client', function ($query) use ($context) {
-                    $query->where('id', $context->getPlatform()->getRecordId());
-                })->first();
+            $ltiContext = $this->environment->contexts()->with('client')
+                ->where('external_context_id', $context->ltiContextId)
+                ->where('client_id', $this->getClientForeignKeyFromPlatform($context->getPlatform()))
+                ->first();
 
             if (! $ltiContext) {
                 return false;

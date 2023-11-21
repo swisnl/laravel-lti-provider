@@ -1,19 +1,20 @@
 <?php
 
-namespace Swis\Laravel\LtiProvider\Models;
+namespace Workbench\App\OverrideModels;
 
 use ceLTIc\LTI\Platform;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Swis\Laravel\LtiProvider\Models\Contracts\LtiClient;
 use Swis\Laravel\LtiProvider\Models\Traits\HasClientCapabilities;
 
 /**
- * @property int                                             $id
+ * @property string                                          $id
+ * @property int                                             $nr
  * @property string                                          $name
- * @property string                                          $key
  * @property string|null                                     $secret
  * @property string|null                                     $public_key
  * @property string|null                                     $lti_platform_id
@@ -26,32 +27,30 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasClientCapabilities;
  * @property \Illuminate\Support\Carbon|null                 $created_at
  * @property \Illuminate\Support\Carbon|null                 $updated_at
  *
- * @method static \Illuminate\Database\Eloquent\Builder|SimpleClient newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|SimpleClient newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|SimpleClient query()
- * @method static \Illuminate\Database\Eloquent\Builder|SimpleClient whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|SimpleClient whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|SimpleClient whereKey($value)
- * @method static \Illuminate\Database\Eloquent\Builder|SimpleClient whereLtiClientId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|SimpleClient whereLtiDeploymentId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|SimpleClient whereLtiPlatformId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|SimpleClient whereLtiProfile($value)
- * @method static \Illuminate\Database\Eloquent\Builder|SimpleClient whereLtiSettings($value)
- * @method static \Illuminate\Database\Eloquent\Builder|SimpleClient whereLtiSignatureMethod($value)
- * @method static \Illuminate\Database\Eloquent\Builder|SimpleClient whereLtiVersion($value)
- * @method static \Illuminate\Database\Eloquent\Builder|SimpleClient whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|SimpleClient wherePublicKey($value)
- * @method static \Illuminate\Database\Eloquent\Builder|SimpleClient whereSecret($value)
- * @method static \Illuminate\Database\Eloquent\Builder|SimpleClient whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Client newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Client newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Client query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Client whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Client whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Client whereLtiClientId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Client whereLtiDeploymentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Client whereLtiPlatformId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Client whereLtiProfile($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Client whereLtiSettings($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Client whereLtiSignatureMethod($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Client whereLtiVersion($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Client whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Client whereNr($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Client wherePublicKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Client whereSecret($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Client whereUpdatedAt($value)
  */
-class SimpleClient extends Model implements LtiClient
+class Client extends Model implements LtiClient
 {
     use HasClientCapabilities;
-
-    protected $table = 'clients';
+    use HasUuids;
 
     protected $fillable = [
-        'key',
         'name',
         'secret',
         'public_key',
@@ -83,7 +82,8 @@ class SimpleClient extends Model implements LtiClient
 
     protected static function booted(): void
     {
-        static::creating(function (SimpleClient $client) {
+        static::creating(function (Client $client) {
+            $client->nr = $client->nr ?: Client::max('nr') + 1;
             $client->secret = $client->secret ?: Str::random(40);
             $client->public_key = $client->public_key ?: Str::random(40);
         });
@@ -91,9 +91,9 @@ class SimpleClient extends Model implements LtiClient
 
     public function fillLtiPlatform(Platform $platform): void
     {
-        $platform->setRecordId($this->id);
+        $platform->setRecordId($this->nr);
         $platform->name = $this->name;
-        $platform->setKey($this->key);
+        $platform->setKey($this->id);
         $platform->secret = $this->secret;
         $platform->platformId = $this->lti_platform_id;
         $platform->clientId = $this->lti_client_id;
@@ -132,26 +132,26 @@ class SimpleClient extends Model implements LtiClient
 
     public static function getLtiRecordIdColumn(): string
     {
-        return 'id';
+        return 'nr';
     }
 
     public static function getLtiKeyColumn(): string
     {
-        return 'key';
+        return 'id';
     }
 
     public function getLtiRecordId(): ?int
     {
-        return $this->id;
+        return $this->nr;
     }
 
     public function getLtiKey(): string
     {
-        return $this->key;
+        return $this->id;
     }
 
     public static function getForeignKeyFromPlatform(Platform $platform): int|string
     {
-        return $platform->getRecordId();
+        return $platform->getKey();
     }
 }

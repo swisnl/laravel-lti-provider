@@ -12,11 +12,12 @@ return new class() extends Migration
     public function up(): void
     {
         Schema::create('lti_nonces', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
 
-            $table->uuidMorphs('lti_environment');
+            $table->morphs('lti_environment');
 
-            $table->uuid('client_id');
+            $table->foreignId('client_id')->constrained('clients')->cascadeOnDelete();
+
             $table->string('nonce', 50);
             $table->dateTime('expires_at');
 
@@ -26,11 +27,11 @@ return new class() extends Migration
         });
 
         Schema::create('lti_access_tokens', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
 
-            $table->uuidMorphs('lti_environment');
+            $table->morphs('lti_environment');
 
-            $table->uuid('client_id')->unique();
+            $table->foreignId('client_id')->constrained('clients')->cascadeOnDelete();
 
             $table->string('access_token', 2000);
             $table->text('scopes');
@@ -42,9 +43,10 @@ return new class() extends Migration
         Schema::create('lti_contexts', function (Blueprint $table) {
             $table->id();
 
-            $table->uuidMorphs('lti_environment');
+            $table->morphs('lti_environment');
 
-            $table->uuid('client_id');
+            $table->foreignId('client_id')->constrained('clients')->cascadeOnDelete();
+
             $table->string('title')->nullable();
             $table->string('external_context_id', 255);
             $table->text('settings');
@@ -55,9 +57,10 @@ return new class() extends Migration
         Schema::create('lti_resource_links', function (Blueprint $table) {
             $table->id();
 
-            $table->uuidMorphs('lti_environment');
+            $table->morphs('lti_environment');
 
-            $table->uuid('client_id');
+            $table->foreignId('client_id')->constrained('clients')->cascadeOnDelete();
+
             $table->foreignId('lti_context_id')->nullable()->constrained('lti_contexts')->cascadeOnDelete();
 
             $table->string('title')->nullable();
@@ -70,7 +73,7 @@ return new class() extends Migration
         Schema::create('lti_user_results', function (Blueprint $table) {
             $table->id();
 
-            $table->uuidMorphs('lti_environment');
+            $table->morphs('lti_environment');
 
             $table->foreignId('lti_resource_link_id')->constrained('lti_resource_links')->cascadeOnDelete();
 

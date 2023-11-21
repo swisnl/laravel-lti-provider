@@ -16,24 +16,29 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Workbench\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            function (string $modelName): string {
+                $modelNameParts = explode('\\', $modelName);
+                $modelName = implode('\\', array_slice($modelNameParts, -2, 2));
+
+                return 'Workbench\\Database\\Factories\\'.$modelName.'Factory';
+            }
         );
     }
 
-    protected function defineDatabaseMigrations()
+    protected function defineDatabaseMigrations(): void
     {
         $this->loadMigrationsFrom(workbench_path('database/migrations'));
         $this->loadMigrationsFrom(package_path('database/migrations'));
     }
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             LtiServiceProvider::class,
         ];
     }
 
-    public function getEnvironmentSetUp($app)
+    public function getEnvironmentSetUp($app): void
     {
         config()->set('database.default', 'sqlite');
         config()->set('database.connections.sqlite', [

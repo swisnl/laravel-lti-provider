@@ -1,6 +1,6 @@
 <?php
 
-namespace Workbench\Database\Factories;
+namespace Workbench\Database\Factories\Models;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Workbench\App\Models\SimpleLtiEnvironment;

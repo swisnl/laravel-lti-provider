@@ -13,8 +13,6 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasLtiClient;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 
 /**
- * \Swis\Laravel\LtiProvider\Models\LtiContext.
- *
  * @property int                                                                                             $id
  * @property string|null                                                                                     $title
  * @property string                                                                                          $external_context_id
@@ -38,6 +36,8 @@ class LtiContext extends Model
 {
     use HasLtiClient;
     use HasLtiEnvironment;
+
+    protected $table = 'lti_contexts';
 
     protected $fillable = [
         'client_id',

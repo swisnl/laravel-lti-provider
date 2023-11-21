@@ -5,21 +5,18 @@ declare(strict_types=1);
 namespace Swis\Laravel\LtiProvider\Models;
 
 use ceLTIc\LTI\AccessToken;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiClient;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 
 /**
- * \Swis\Laravel\LtiProvider\Models\LtiAccessToken.
- *
- * @property string                                                                                   $id
- * @property string                                                                                   $access_token
- * @property array                                                                                    $scopes
- * @property \Illuminate\Support\Carbon                                                               $expires_at
- * @property \Illuminate\Support\Carbon|null                                                          $created_at
- * @property \Illuminate\Support\Carbon|null                                                          $updated_at
+ * @property string                          $id
+ * @property string                          $access_token
+ * @property array                           $scopes
+ * @property \Illuminate\Support\Carbon      $expires_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  *
  * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken newQuery()
@@ -35,7 +32,8 @@ class LtiAccessToken extends Model
 {
     use HasLtiClient;
     use HasLtiEnvironment;
-    use HasUuids;
+
+    protected $table = 'lti_access_tokens';
 
     protected $fillable = [
         'client_id',

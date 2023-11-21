@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Tests\ModelDataConnector;
 
 use ceLTIc\LTI\AccessToken;
 use ceLTIc\LTI\Context;
@@ -11,39 +11,33 @@ use ceLTIc\LTI\ResourceLink;
 use ceLTIc\LTI\ResourceLinkShareKey;
 use ceLTIc\LTI\UserResult;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
-use Swis\Laravel\LtiProvider\ModelDataConnector;
-use Swis\Laravel\LtiProvider\Models\Contracts\LtiEnvironment;
+use Swis\Laravel\LtiProvider\Models\Contracts\LtiClient;
 use Swis\Laravel\LtiProvider\Models\SimpleClient;
-use Workbench\App\Models\SimpleLtiEnvironment;
 
-class ModelDataConnectorTest extends TestCase
+trait ModelDataConnectorTests
 {
-    use RefreshDatabase;
-
-    protected LtiEnvironment $ltiEnvironment;
-
-    protected ModelDataConnector $connector;
-
-    protected function setUp(): void
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
+    protected function createClient(array $attributes = []): LtiClient&Model
     {
-        parent::setUp();
+        /** @var LtiClient&Model $client */
+        $client = Factory::factoryForModel(config('lti-provider.class-names.lti-client'))->create($attributes);
 
-        $this->ltiEnvironment = SimpleLtiEnvironment::factory()->create();
-        $this->connector = ModelDataConnector::make($this->ltiEnvironment);
+        return $client;
     }
 
     /** @test */
     public function it_should_load_platform(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
 
         // Assert
         $this->assertEquals($client->name, $platform->name);
@@ -54,22 +48,21 @@ class ModelDataConnectorTest extends TestCase
     {
         // Arrange
         $originalName = 'Foobar';
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create([
+        $client = $this->createClient([
             'name' => $originalName,
         ]);
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $platform->name = 'Barfoo';
         $platform->setSetting('a', 'b');
         $platform->save();
 
-        $client->refresh();
+        $reloadedPlatform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
 
         // Assert
-        $this->assertEquals($originalName, $client->name);
-        $this->assertEquals('b', $client->lti_settings['a']);
+        $this->assertEquals($originalName, $reloadedPlatform->name);
+        $this->assertEquals('b', $reloadedPlatform->getSetting('a'));
     }
 
     /** @test */
@@ -90,17 +83,16 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_load_context_from_external_context_id(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $context = $this->ltiEnvironment->contexts()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'external_context_id' => '123',
             'title' => 'Barfoo',
         ]);
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiContext = Context::fromPlatform($platform, $context->external_context_id);
 
         // Assert
@@ -111,11 +103,10 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_insert_context(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiContext = Context::fromPlatform($platform, '123');
         $ltiContext->title = 'Barfoo';
         $ltiContext->save();
@@ -129,17 +120,16 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_update_context(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $context = $this->ltiEnvironment->contexts()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'external_context_id' => '123',
             'title' => 'Barfoo',
         ]);
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiContext = Context::fromPlatform($platform, $context->external_context_id);
 
         $ltiContext->setSetting('a', 'b');
@@ -155,17 +145,16 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_delete_context(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $context = $this->ltiEnvironment->contexts()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'external_context_id' => '123',
             'title' => 'Barfoo',
         ]);
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiContext = Context::fromPlatform($platform, $context->external_context_id);
 
         $ltiContext->delete();
@@ -179,11 +168,10 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_load_resource_link_from_record_id(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $resourceLink = $this->ltiEnvironment->resourceLinks()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'external_resource_link_id' => '123',
             'title' => 'Barfoo',
         ]);
@@ -199,17 +187,16 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_load_resource_link_from_external_resource_link_id_without_context(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $resourceLink = $this->ltiEnvironment->resourceLinks()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'external_resource_link_id' => '123',
             'title' => 'Barfoo',
         ]);
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiResourceLink = ResourceLink::fromPlatform($platform, $resourceLink->external_resource_link_id);
 
         // Assert
@@ -220,11 +207,10 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_insert_resource_link_without_context(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiResourceLink = ResourceLink::fromPlatform($platform, '123');
         $ltiResourceLink->title = 'Barfoo';
         $ltiResourceLink->save();
@@ -238,11 +224,10 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_load_resource_link_from_external_resource_link_id_with_context(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $context = $this->ltiEnvironment->contexts()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'external_context_id' => '123',
             'title' => 'Barfoo',
         ]);
@@ -254,7 +239,7 @@ class ModelDataConnectorTest extends TestCase
         ]);
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiContext = Context::fromPlatform($platform, $context->external_context_id);
         $ltiResourceLink = ResourceLink::fromContext($ltiContext, $resourceLink->external_resource_link_id);
 
@@ -266,17 +251,16 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_insert_resource_link_with_context(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $context = $this->ltiEnvironment->contexts()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'external_context_id' => '123',
             'title' => 'Barfoo',
         ]);
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiContext = Context::fromPlatform($platform, $context->external_context_id);
         $ltiResourceLink = ResourceLink::fromContext($ltiContext, '123');
         $ltiResourceLink->title = 'Barfoo';
@@ -294,17 +278,16 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_delete_resource_link(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $resourceLink = $this->ltiEnvironment->resourceLinks()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'external_resource_link_id' => '123',
             'title' => 'Baz',
         ]);
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiResourceLink = ResourceLink::fromPlatform($platform, $resourceLink->external_resource_link_id);
 
         $ltiResourceLink->delete();
@@ -318,11 +301,10 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_get_user_results_for_resource_link(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $context = $this->ltiEnvironment->contexts()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'external_context_id' => '123',
             'title' => 'Barfoo',
         ]);
@@ -355,7 +337,7 @@ class ModelDataConnectorTest extends TestCase
         ]);
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiResourceLink1 = ResourceLink::fromPlatform($platform, $resourceLink1->external_resource_link_id);
         $ltiResourceLink2 = ResourceLink::fromPlatform($platform, $resourceLink2->external_resource_link_id);
 
@@ -374,11 +356,10 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_never_return_shares_for_a_result_link(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $context = $this->ltiEnvironment->contexts()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'external_context_id' => '123',
             'title' => 'Barfoo',
         ]);
@@ -390,7 +371,7 @@ class ModelDataConnectorTest extends TestCase
         ]);
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $context = Context::fromPlatform($platform, $context->external_context_id);
         $ltiResourceLink = ResourceLink::fromContext($context, $resourceLink->external_resource_link_id);
 
@@ -404,11 +385,10 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_load_user_result_from_record_id(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $resourceLink = $this->ltiEnvironment->resourceLinks()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'external_resource_link_id' => '123',
             'title' => 'Barfoo',
         ]);
@@ -429,11 +409,10 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_load_nonce(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $nonce = $this->ltiEnvironment->nonces()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'nonce' => '123',
             'expires_at' => Carbon::now()->addMinutes(5),
         ]);
@@ -451,11 +430,10 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_insert_nonce(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiNonce = new PlatformNonce($platform, '123');
         $ltiNonce->save();
 
@@ -469,17 +447,16 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_update_nonce(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $nonce = $this->ltiEnvironment->nonces()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'nonce' => '123',
             'expires_at' => Carbon::now()->addMinutes(5),
         ]);
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiNonce = new PlatformNonce($platform, $nonce->nonce);
         $ltiNonce->save();
 
@@ -492,17 +469,16 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_delete_nonce(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $nonce = $this->ltiEnvironment->nonces()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'nonce' => '123',
             'expires_at' => Carbon::now()->addMinutes(5),
         ]);
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiNonce = new PlatformNonce($platform, $nonce->nonce);
         $ltiNonce->delete();
 
@@ -516,18 +492,17 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_load_access_token(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $accessToken = $this->ltiEnvironment->accessTokens()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'access_token' => '123',
             'scopes' => ['foo', 'bar'],
             'expires_at' => Carbon::now()->addMinutes(5),
         ]);
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiAccessToken = new AccessToken($platform);
 
         // Assert
@@ -538,11 +513,10 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_insert_access_token(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiAccessToken = new AccessToken($platform, ['foo', 'bar'], '123', 5 * 60);
         $ltiAccessToken->save();
 
@@ -556,18 +530,17 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_update_access_token(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $accessToken = $this->ltiEnvironment->accessTokens()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'access_token' => '123',
             'scopes' => ['foo', 'bar'],
             'expires_at' => Carbon::now()->addMinutes(5),
         ]);
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiAccessToken = new AccessToken($platform, ['foo', 'bar'], '456', 5 * 60);
         $ltiAccessToken->save();
 
@@ -580,11 +553,10 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_never_load_resource_link_share_key(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $context = $this->ltiEnvironment->contexts()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'external_context_id' => '123',
             'title' => 'Barfoo',
         ]);
@@ -596,7 +568,7 @@ class ModelDataConnectorTest extends TestCase
         ]);
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $context = Context::fromPlatform($platform, $context->external_context_id);
         $ltiResourceLink = ResourceLink::fromContext($context, $resourceLink->external_resource_link_id);
         $shareKey = new ResourceLinkShareKey($ltiResourceLink);
@@ -611,11 +583,10 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_never_save_resource_link_share_key(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $context = $this->ltiEnvironment->contexts()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'external_context_id' => '123',
             'title' => 'Barfoo',
         ]);
@@ -627,7 +598,7 @@ class ModelDataConnectorTest extends TestCase
         ]);
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $context = Context::fromPlatform($platform, $context->external_context_id);
         $ltiResourceLink = ResourceLink::fromContext($context, $resourceLink->external_resource_link_id);
         $shareKey = new ResourceLinkShareKey($ltiResourceLink);
@@ -641,11 +612,10 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_never_delete_resource_link_share_key(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $context = $this->ltiEnvironment->contexts()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'external_context_id' => '123',
             'title' => 'Barfoo',
         ]);
@@ -657,7 +627,7 @@ class ModelDataConnectorTest extends TestCase
         ]);
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $context = Context::fromPlatform($platform, $context->external_context_id);
         $ltiResourceLink = ResourceLink::fromContext($context, $resourceLink->external_resource_link_id);
         $shareKey = new ResourceLinkShareKey($ltiResourceLink);
@@ -672,11 +642,10 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_load_user_result_from_user_id(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $resourceLink = $this->ltiEnvironment->resourceLinks()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'external_resource_link_id' => '123',
             'title' => 'Barfoo',
         ]);
@@ -688,7 +657,7 @@ class ModelDataConnectorTest extends TestCase
         ]);
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiResourceLink = ResourceLink::fromPlatform($platform, $resourceLink->external_resource_link_id);
         $ltiUserResult = UserResult::fromResourceLink($ltiResourceLink, $userResult->external_user_id);
 
@@ -700,11 +669,10 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_insert_user_result(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $context = $this->ltiEnvironment->contexts()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'external_context_id' => '123',
             'title' => 'Barfoo',
         ]);
@@ -716,7 +684,7 @@ class ModelDataConnectorTest extends TestCase
         ]);
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiContext = Context::fromPlatform($platform, $context->external_context_id);
         $ltiResourceLink = ResourceLink::fromContext($ltiContext, $resourceLink->external_resource_link_id);
         $ltiUserResult = new UserResult();
@@ -741,11 +709,10 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_update_user_result(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $context = $this->ltiEnvironment->contexts()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'external_context_id' => '123',
             'title' => 'Barfoo',
         ]);
@@ -763,7 +730,7 @@ class ModelDataConnectorTest extends TestCase
         ]);
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiContext = Context::fromPlatform($platform, $context->external_context_id);
         $ltiResourceLink = ResourceLink::fromContext($ltiContext, $resourceLink->external_resource_link_id);
         $ltiUserResult = UserResult::fromResourceLink($ltiResourceLink, $userResult->external_user_id);
@@ -784,11 +751,10 @@ class ModelDataConnectorTest extends TestCase
     public function it_should_delete_user_result(): void
     {
         // Arrange
-        /** @var SimpleClient $client */
-        $client = Factory::factoryForModel(SimpleClient::class)->create();
+        $client = $this->createClient();
 
         $context = $this->ltiEnvironment->contexts()->create([
-            'client_id' => $client->id,
+            'client_id' => $client->getKey(),
             'external_context_id' => '123',
             'title' => 'Barfoo',
         ]);
@@ -806,7 +772,7 @@ class ModelDataConnectorTest extends TestCase
         ]);
 
         // Act
-        $platform = Platform::fromRecordId($client->id, $this->connector);
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiContext = Context::fromPlatform($platform, $context->external_context_id);
         $ltiResourceLink = ResourceLink::fromContext($ltiContext, $resourceLink->external_resource_link_id);
         $ltiUserResult = UserResult::fromResourceLink($ltiResourceLink, $userResult->external_user_id);

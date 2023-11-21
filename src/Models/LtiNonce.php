@@ -5,15 +5,12 @@ declare(strict_types=1);
 namespace Swis\Laravel\LtiProvider\Models;
 
 use ceLTIc\LTI\PlatformNonce;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiClient;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 
 /**
- * \Swis\Laravel\LtiProvider\Models\LtiNonce.
- *
  * @property string                          $id
  * @property string                          $nonce
  * @property \Illuminate\Support\Carbon      $expires_at
@@ -33,7 +30,8 @@ class LtiNonce extends Model
 {
     use HasLtiClient;
     use HasLtiEnvironment;
-    use HasUuids;
+
+    protected $table = 'lti_nonces';
 
     protected $fillable = [
         'client_id',

@@ -14,8 +14,6 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasLtiClient;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 
 /**
- * \Swis\Laravel\LtiProvider\Models\LtiResourceLink.
- *
  * @property int                                              $id
  * @property int|null                                         $lti_context_id
  * @property string|null                                      $title
@@ -41,6 +39,8 @@ class LtiResourceLink extends Model
 {
     use HasLtiClient;
     use HasLtiEnvironment;
+
+    protected $table = 'lti_resource_links';
 
     protected $fillable = [
         'client_id',

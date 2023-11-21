@@ -1,17 +1,17 @@
 <?php
 
-namespace Workbench\Database\Factories;
+namespace Workbench\Database\Factories\OverrideModels;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
-use Swis\Laravel\LtiProvider\Models\SimpleClient;
+use Workbench\App\OverrideModels\Client;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Swis\Laravel\LtiProvider\Models\SimpleClient>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Workbench\App\OverrideModels\Client>
  */
-class SimpleClientFactory extends Factory
+class ClientFactory extends Factory
 {
-    protected $model = SimpleClient::class;
+    protected $model = Client::class;
 
     /**
      * {@inheritDoc}
@@ -22,7 +22,6 @@ class SimpleClientFactory extends Factory
 
         return [
             'name' => $name,
-            'key' => Str::slug($name),
             'secret' => Str::random(40),
             'lti_platform_id' => Str::random(8),
         ];
