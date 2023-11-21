@@ -63,7 +63,7 @@ class LtiContext extends Model
     {
         $context->setRecordId($this->id);
 
-        $context->setPlatformId($this->client->nr);
+        $context->setPlatformId($this->client->getLtiRecordId());
 
         $context->title = $this->title;
         $context->ltiContextId = $this->external_context_id;
@@ -72,7 +72,7 @@ class LtiContext extends Model
 
     public function fillFromLtiContext(Context $context): void
     {
-        $this->client_id = $context->getPlatform()->getKey();
+        $this->client_id = config('lti-provider.class-names.lti-client')::getForeignKeyFromPlatform($context->getPlatform());
 
         $this->title = $context->title;
         $this->external_context_id = $context->ltiContextId;

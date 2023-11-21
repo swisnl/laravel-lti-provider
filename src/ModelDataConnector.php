@@ -46,11 +46,26 @@ class ModelDataConnector extends DataConnector
         return $this->clientClassName::query();
     }
 
+    protected function getClientLtiRecordIdColumn(): string
+    {
+        return $this->clientClassName::getLtiRecordIdColumn();
+    }
+
+    protected function getClientLtiKeyColumn(): string
+    {
+        return $this->clientClassName::getLtiKeyColumn();
+    }
+
+    protected function getClientForeignKeyFromPlatform(Platform $platform): int|string
+    {
+        return $this->clientClassName::getForeignKeyFromPlatform($platform);
+    }
+
     public function loadPlatform(Platform $platform): bool
     {
         if (! empty($platform->getRecordId())) {
             /** @var LtiClient|null $client */
-            $client = $this->getClientBuilder()->firstWhere('nr', $platform->getRecordId());
+            $client = $this->getClientBuilder()->firstWhere($this->getClientLtiRecordIdColumn(), $platform->getRecordId());
             if (! $client) {
                 return false;
             }
@@ -86,7 +101,7 @@ class ModelDataConnector extends DataConnector
 
         if (! empty($platform->getKey())) {
             /** @var LtiClient|null $client */
-            $client = $this->getClientBuilder()->find($platform->getKey());
+            $client = $this->getClientBuilder()->firstWhere($this->getClientLtiKeyColumn(), $platform->getKey());
             if (! $client) {
                 return false;
             }
@@ -103,7 +118,7 @@ class ModelDataConnector extends DataConnector
     {
         if (! empty($platform->getRecordId())) {
             /** @var (LtiClient&Model)|null $client */
-            $client = $this->getClientBuilder()->firstWhere('nr', $platform->getRecordId());
+            $client = $this->getClientBuilder()->firstWhere($this->getClientLtiRecordIdColumn(), $platform->getRecordId());
             if (! $client) {
                 return false;
             }
@@ -158,9 +173,9 @@ class ModelDataConnector extends DataConnector
             /** @var \Swis\Laravel\LtiProvider\Models\LtiContext|null $ltiContext */
             $ltiContext = $this->environment->contexts()->with('client')->where('external_context_id', $context->ltiContextId)
                 ->whereHas('client', function ($query) use ($context) {
-                    $query->where('id', $context->getPlatform()->getKey());
-                })
-                ->first();
+                    $query->where('id', $context->getPlatform()->getRecordId());
+                })->first();
+
             if (! $ltiContext) {
                 return false;
             }
@@ -258,9 +273,9 @@ class ModelDataConnector extends DataConnector
         $ltiResourceLink = $this->environment->resourceLinks()->with('client')->where('external_resource_link_id', $resourceLink->ltiResourceLinkId)
             ->where(function ($query) use ($resourceLink) {
                 $query
-                    ->where('client_id', $resourceLink->getPlatform()->getKey())
+                    ->where('client_id', $this->getClientForeignKeyFromPlatform($resourceLink->getPlatform()))
                     ->orWhereHas('context', function ($query) use ($resourceLink) {
-                        $query->where('client_id', $resourceLink->getPlatform()->getKey());
+                        $query->where('client_id', $this->getClientForeignKeyFromPlatform($resourceLink->getPlatform()));
                     });
             })
             ->first();
@@ -358,7 +373,7 @@ class ModelDataConnector extends DataConnector
         }
 
         /** @var \Swis\Laravel\LtiProvider\Models\LtiNonce|null $ltiNonce */
-        $ltiNonce = $this->environment->nonces()->where('client_id', $nonce->getPlatform()->getKey())
+        $ltiNonce = $this->environment->nonces()->where('client_id', $this->getClientForeignKeyFromPlatform($nonce->getPlatform()))
             ->where('nonce', $nonce->getValue())
             ->where('expires_at', '>', Carbon::now())
             ->first();
@@ -380,7 +395,7 @@ class ModelDataConnector extends DataConnector
 
         /** @var \Swis\Laravel\LtiProvider\Models\LtiNonce $ltiNonce */
         $ltiNonce = $this->environment->nonces()->firstOrNew([
-            'client_id' => $nonce->getPlatform()->getKey(),
+            'client_id' => $this->getClientForeignKeyFromPlatform($nonce->getPlatform()),
             'nonce' => $nonce->getValue(),
         ]);
 
@@ -396,7 +411,7 @@ class ModelDataConnector extends DataConnector
             return parent::deletePlatformNonce($nonce);
         }
 
-        $this->environment->nonces()->where('client_id', $nonce->getPlatform()->getKey())
+        $this->environment->nonces()->where('client_id', $this->getClientForeignKeyFromPlatform($nonce->getPlatform()))
             ->where('nonce', $nonce->getValue())
             ->delete();
 
@@ -410,7 +425,7 @@ class ModelDataConnector extends DataConnector
         }
 
         /** @var \Swis\Laravel\LtiProvider\Models\LtiAccessToken|null $ltiAccessToken */
-        $ltiAccessToken = $this->environment->accessTokens()->where('client_id', $accessToken->getPlatform()->getKey())
+        $ltiAccessToken = $this->environment->accessTokens()->where('client_id', $this->getClientForeignKeyFromPlatform($accessToken->getPlatform()))
             ->first();
 
         if (! $ltiAccessToken) {
@@ -430,7 +445,7 @@ class ModelDataConnector extends DataConnector
 
         /** @var \Swis\Laravel\LtiProvider\Models\LtiAccessToken $ltiAccessToken */
         $ltiAccessToken = $this->environment->accessTokens()->firstOrNew([
-            'client_id' => $accessToken->getPlatform()->getKey(),
+            'client_id' => $this->getClientForeignKeyFromPlatform($accessToken->getPlatform()),
         ]);
         $ltiAccessToken->fillFromLtiAccessToken($accessToken);
         $ltiAccessToken->save();

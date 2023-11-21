@@ -13,7 +13,7 @@ trait HasClientCapabilities
      */
     public function contexts(): HasMany
     {
-        return $this->hasMany(config('lti-provider.class-names.lti-context'));
+        return $this->hasMany(config('lti-provider.class-names.lti-context'), 'client_id');
     }
 
     /**
@@ -21,7 +21,7 @@ trait HasClientCapabilities
      */
     public function resourceLinks(): HasMany
     {
-        return $this->hasMany(config('lti-provider.class-names.lti-resource-link'));
+        return $this->hasMany(config('lti-provider.class-names.lti-resource-link'), 'client_id');
     }
 
     /**
@@ -29,7 +29,7 @@ trait HasClientCapabilities
      */
     public function nonces(): HasMany
     {
-        return $this->hasMany(config('lti-provider.class-names.lti-nonce'));
+        return $this->hasMany(config('lti-provider.class-names.lti-nonce'), 'client_id');
     }
 
     /**
@@ -37,6 +37,6 @@ trait HasClientCapabilities
      */
     public function accessTokens(): HasMany
     {
-        return $this->hasMany(config('lti-provider.class-names.lti-access-token'));
+        return $this->hasMany(config('lti-provider.class-names.lti-access-token'), 'client_id');
     }
 }

@@ -14,6 +14,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 interface LtiClient
 {
+    public static function getLtiRecordIdColumn(): string;
+
+    public static function getLtiKeyColumn(): string;
+
+    public static function getForeignKeyFromPlatform(Platform $platform): int|string;
+
+    public function getLtiRecordId(): ?int;
+
+    public function getLtiKey(): string;
+
     public function fillLtiPlatform(Platform $platform): void;
 
     public function fillFromLtiPlatform(Platform $platform): void;

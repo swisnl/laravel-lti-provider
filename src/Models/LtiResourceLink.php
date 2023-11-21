@@ -78,7 +78,7 @@ class LtiResourceLink extends Model
     {
         $resourceLink->setRecordId($this->id);
 
-        $resourceLink->setPlatformId($this->client->nr);
+        $resourceLink->setPlatformId($this->client->getLtiRecordId());
         $resourceLink->setContextId($this->lti_context_id);
 
         $resourceLink->title = $this->title;
@@ -88,7 +88,7 @@ class LtiResourceLink extends Model
 
     public function fillFromLtiResourceLink(ResourceLink $resourceLink): void
     {
-        $this->client_id = $resourceLink->getPlatform()->getKey();
+        $this->client_id = config('lti-provider.class-names.lti-client')::getForeignKeyFromPlatform($resourceLink->getPlatform());
         $this->lti_context_id = $resourceLink->getContext()?->getRecordId();
 
         $this->title = $resourceLink->title;
