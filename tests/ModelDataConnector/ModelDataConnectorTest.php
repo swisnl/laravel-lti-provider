@@ -13,7 +13,6 @@ class ModelDataConnectorTest extends TestCase
     // This trait contains the actual tests, because we want to run the same
     // tests for a different set of models.
     use ModelDataConnectorTests;
-
     use RefreshDatabase;
 
     protected LtiEnvironment $ltiEnvironment;
