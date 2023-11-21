@@ -22,7 +22,6 @@ class LtiServiceProvider extends \Spatie\LaravelPackageTools\PackageServiceProvi
                 $command
                     ->publishConfigFile()
                     ->publishMigrations()
-                    ->askToRunMigrations()
                     ->askToStarRepoOnGitHub('swisnl/laravel-lti-provider');
             });
     }
