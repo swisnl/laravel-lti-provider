@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 
 class DeleteExpiredLtiNonces extends Command
 {
-    protected $signature = 'lti:delete-expired-nonces';
+    protected $signature = 'lti-provider:delete-expired-nonces';
 
     protected $description = 'Cleanup the expired LTI nonces from the database';
 
