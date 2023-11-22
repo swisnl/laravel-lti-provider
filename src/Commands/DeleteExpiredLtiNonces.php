@@ -12,7 +12,7 @@ class DeleteExpiredLtiNonces extends Command
 
     public function handle(): int
     {
-        config('lti-provider.class-names.lti-nonce')::deleteExpired();
+        config('lti-provider.class-names.nonce')::deleteExpired();
 
         return static::SUCCESS;
     }

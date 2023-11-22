@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use Swis\Laravel\LtiProvider\Models\Contracts\LtiClient;
+use Swis\Laravel\LtiProvider\Models\Contracts\Client as ClientContract;
 use Swis\Laravel\LtiProvider\Models\Traits\HasClientCapabilities;
 
 /**
@@ -45,10 +45,12 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasClientCapabilities;
  * @method static \Illuminate\Database\Eloquent\Builder|Client whereSecret($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Client whereUpdatedAt($value)
  */
-class Client extends Model implements LtiClient
+class Client extends Model implements ClientContract
 {
     use HasClientCapabilities;
     use HasUuids;
+
+    protected $table = 'lti_clients';
 
     protected $fillable = [
         'name',

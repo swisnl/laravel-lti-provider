@@ -11,7 +11,7 @@ return new class() extends Migration
      */
     public function up(): void
     {
-        Schema::create('clients', function (Blueprint $table) {
+        Schema::create('lti_clients', function (Blueprint $table) {
             $table->id();
 
             // Admin title
@@ -42,6 +42,6 @@ return new class() extends Migration
      */
     public function down(): void
     {
-        Schema::drop('clients');
+        Schema::drop('lti_clients');
     }
 };

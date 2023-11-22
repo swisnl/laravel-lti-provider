@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Swis\Laravel\LtiProvider\Models;
 
-use ceLTIc\LTI\AccessToken;
+use ceLTIc\LTI\AccessToken as CelticAccessToken;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
-use Swis\Laravel\LtiProvider\Models\Traits\HasLtiClient;
+use Swis\Laravel\LtiProvider\Models\Traits\HasClient;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 
 /**
@@ -18,19 +18,19 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
- * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken query()
- * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken whereAccessToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken whereExpiresAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken whereScopes($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LtiAccessToken whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|AccessToken newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|AccessToken newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|AccessToken query()
+ * @method static \Illuminate\Database\Eloquent\Builder|AccessToken whereAccessToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|AccessToken whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|AccessToken whereExpiresAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|AccessToken whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|AccessToken whereScopes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|AccessToken whereUpdatedAt($value)
  */
-class LtiAccessToken extends Model
+class AccessToken extends Model
 {
-    use HasLtiClient;
+    use HasClient;
     use HasLtiEnvironment;
 
     protected $table = 'lti_access_tokens';
@@ -56,7 +56,7 @@ class LtiAccessToken extends Model
         'scopes' => '[]',
     ];
 
-    public function fillLtiAccessToken(AccessToken $accessToken): void
+    public function fillLtiAccessToken(CelticAccessToken $accessToken): void
     {
         $accessToken->scopes = $this->scopes;
         $accessToken->token = $this->access_token;
@@ -65,7 +65,7 @@ class LtiAccessToken extends Model
         $accessToken->updated = $this->updated_at->getTimestamp();
     }
 
-    public function fillFromLtiAccessToken(AccessToken $accessToken): void
+    public function fillFromLtiAccessToken(CelticAccessToken $accessToken): void
     {
         $this->scopes = $accessToken->scopes;
         $this->access_token = $accessToken->token;

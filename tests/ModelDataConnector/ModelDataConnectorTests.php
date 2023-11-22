@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Carbon;
-use Swis\Laravel\LtiProvider\Models\Contracts\LtiClient;
+use Swis\Laravel\LtiProvider\Models\Contracts\Client;
 use Swis\Laravel\LtiProvider\Models\SimpleClient;
 
 trait ModelDataConnectorTests
@@ -22,10 +22,10 @@ trait ModelDataConnectorTests
     /**
      * @param  array<string, mixed>  $attributes
      */
-    protected function createClient(array $attributes = []): LtiClient&Model
+    protected function createClient(array $attributes = []): Client&Model
     {
-        /** @var LtiClient&Model $client */
-        $client = Factory::factoryForModel(config('lti-provider.class-names.lti-client'))->create($attributes);
+        /** @var Client&Model $client */
+        $client = Factory::factoryForModel(config('lti-provider.class-names.client'))->create($attributes);
 
         return $client;
     }

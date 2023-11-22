@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string    $name
  * @property \DateTime $updated_at
  */
-interface LtiClient
+interface Client
 {
     public static function getLtiRecordIdColumn(): string;
 
@@ -29,22 +29,22 @@ interface LtiClient
     public function fillFromLtiPlatform(Platform $platform): void;
 
     /**
-     * @return HasMany<\Swis\Laravel\LtiProvider\Models\LtiResourceLink>
+     * @return HasMany<\Swis\Laravel\LtiProvider\Models\ResourceLink>
      */
     public function resourceLinks(): HasMany;
 
     /**
-     * @return HasMany<\Swis\Laravel\LtiProvider\Models\LtiContext>
+     * @return HasMany<\Swis\Laravel\LtiProvider\Models\Context>
      */
     public function contexts(): HasMany;
 
     /**
-     * @return HasMany<\Swis\Laravel\LtiProvider\Models\LtiNonce>
+     * @return HasMany<\Swis\Laravel\LtiProvider\Models\Nonce>
      */
     public function nonces(): HasMany;
 
     /**
-     * @return HasMany<\Swis\Laravel\LtiProvider\Models\LtiAccessToken>
+     * @return HasMany<\Swis\Laravel\LtiProvider\Models\AccessToken>
      */
     public function accessTokens(): HasMany;
 }

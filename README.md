@@ -37,7 +37,7 @@ create a new class that implements the `Swis\Laravel\Lti\Contracts\LtiClient` in
 `config/lti-provider.php` file:
 
 ```php
-        'lti-client' => 'REFERENCE TO YOUR NEW CLASS',
+        'client' => 'REFERENCE TO YOUR NEW CLASS',
 ```
 
 For inspiration on how to implement your own client, take a look at the `Swis\Laravel\Lti\Models\SimpleClient` class

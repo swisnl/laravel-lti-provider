@@ -38,8 +38,8 @@ class OverrideModelDataConnectorTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        config()->set('lti-provider.class-names.lti-client', \Workbench\App\OverrideModels\Client::class);
-        config()->set('lti-provider.class-names.lti-access-token', \Workbench\App\OverrideModels\LtiAccessToken::class);
-        config()->set('lti-provider.class-names.lti-nonce', \Workbench\App\OverrideModels\LtiNonce::class);
+        config()->set('lti-provider.class-names.client', \Workbench\App\OverrideModels\Client::class);
+        config()->set('lti-provider.class-names.access-token', \Workbench\App\OverrideModels\AccessToken::class);
+        config()->set('lti-provider.class-names.nonce', \Workbench\App\OverrideModels\Nonce::class);
     }
 }

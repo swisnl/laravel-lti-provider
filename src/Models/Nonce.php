@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Swis\Laravel\LtiProvider\Models;
 
-use ceLTIc\LTI\PlatformNonce;
+use ceLTIc\LTI\PlatformNonce as CelticNonce;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
-use Swis\Laravel\LtiProvider\Models\Traits\HasLtiClient;
+use Swis\Laravel\LtiProvider\Models\Traits\HasClient;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 
 /**
@@ -17,18 +17,18 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
- * @method static \Illuminate\Database\Eloquent\Builder|LtiNonce newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|LtiNonce newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|LtiNonce query()
- * @method static \Illuminate\Database\Eloquent\Builder|LtiNonce whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LtiNonce whereExpiresAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LtiNonce whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LtiNonce whereNonce($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LtiNonce whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Nonce newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Nonce newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Nonce query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Nonce whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Nonce whereExpiresAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Nonce whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Nonce whereNonce($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Nonce whereUpdatedAt($value)
  */
-class LtiNonce extends Model
+class Nonce extends Model
 {
-    use HasLtiClient;
+    use HasClient;
     use HasLtiEnvironment;
 
     protected $table = 'lti_nonces';
@@ -50,12 +50,12 @@ class LtiNonce extends Model
         self::query()->where('expires_at', '<', now())->delete();
     }
 
-    public function fillLtiPlatformNonce(PlatformNonce $nonce): void
+    public function fillLtiPlatformNonce(CelticNonce $nonce): void
     {
         $nonce->expires = $this->expires_at->getTimestamp();
     }
 
-    public function fillFromLtiPlatformNonce(PlatformNonce $nonce): void
+    public function fillFromLtiPlatformNonce(CelticNonce $nonce): void
     {
         $this->expires_at = Carbon::createFromTimestamp($nonce->expires);
     }

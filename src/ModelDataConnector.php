@@ -4,30 +4,32 @@ declare(strict_types=1);
 
 namespace Swis\Laravel\LtiProvider;
 
-use ceLTIc\LTI\AccessToken;
-use ceLTIc\LTI\Context;
+use ceLTIc\LTI\AccessToken as CelticAccessToken;
+use ceLTIc\LTI\Context as CelticContext;
 use ceLTIc\LTI\DataConnector\DataConnector;
 use ceLTIc\LTI\Enum\IdScope;
-use ceLTIc\LTI\Platform;
-use ceLTIc\LTI\PlatformNonce;
-use ceLTIc\LTI\ResourceLink;
+use ceLTIc\LTI\Platform as CelticPlatform;
+use ceLTIc\LTI\PlatformNonce as CelticNonce;
+use ceLTIc\LTI\ResourceLink as CelticResourceLink;
 use ceLTIc\LTI\ResourceLinkShareKey;
 use ceLTIc\LTI\Tool;
-use ceLTIc\LTI\UserResult;
+use ceLTIc\LTI\UserResult as CelticUserResult;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Swis\Laravel\LtiProvider\Models\Contracts\LtiClient;
+use Swis\Laravel\LtiProvider\Models\Contracts\Client;
 use Swis\Laravel\LtiProvider\Models\Contracts\LtiEnvironment;
-use Swis\Laravel\LtiProvider\Models\LtiUserResult;
+use Swis\Laravel\LtiProvider\Models\UserResult;
 
 /** @phpstan-consistent-constructor */
 class ModelDataConnector extends DataConnector
 {
     protected LtiEnvironment $environment;
 
-    /** @var class-string<Model&LtiClient> */
+    /**
+     * @var class-string<Model&Client>
+     */
     protected string $clientClassName;
 
     public function __construct(LtiEnvironment $environment, string $clientClassName)
@@ -39,7 +41,7 @@ class ModelDataConnector extends DataConnector
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Builder<Model&LtiClient>
+     * @return \Illuminate\Database\Eloquent\Builder<Model&Client>
      */
     protected function getClientBuilder(): Builder
     {
@@ -56,21 +58,21 @@ class ModelDataConnector extends DataConnector
         return $this->clientClassName::getLtiKeyColumn();
     }
 
-    protected function getClientForeignKeyFromPlatform(Platform $platform): int|string
+    protected function getClientForeignKeyFromPlatform(CelticPlatform $platform): int|string
     {
         return $this->clientClassName::getForeignKeyFromPlatform($platform);
     }
 
-    public function loadPlatform(Platform $platform): bool
+    public function loadPlatform(CelticPlatform $platform): bool
     {
         if (! empty($platform->getRecordId())) {
-            /** @var LtiClient|null $client */
-            $client = $this->getClientBuilder()->firstWhere($this->getClientLtiRecordIdColumn(), $platform->getRecordId());
-            if (! $client) {
+            /** @var Client|null $clientModel */
+            $clientModel = $this->getClientBuilder()->firstWhere($this->getClientLtiRecordIdColumn(), $platform->getRecordId());
+            if (! $clientModel) {
                 return false;
             }
 
-            $client->fillLtiPlatform($platform);
+            $clientModel->fillLtiPlatform($platform);
 
             return true;
         }
@@ -88,25 +90,25 @@ class ModelDataConnector extends DataConnector
                 $query->where('lti_deployment_id', $platform->deploymentId);
             }
 
-            /** @var LtiClient|null $client */
-            $client = $query->first();
-            if (! $client) {
+            /** @var Client|null $clientModel */
+            $clientModel = $query->first();
+            if (! $clientModel) {
                 return false;
             }
 
-            $client->fillLtiPlatform($platform);
+            $clientModel->fillLtiPlatform($platform);
 
             return true;
         }
 
         if (! empty($platform->getKey())) {
-            /** @var LtiClient|null $client */
-            $client = $this->getClientBuilder()->firstWhere($this->getClientLtiKeyColumn(), $platform->getKey());
-            if (! $client) {
+            /** @var Client|null $clientModel */
+            $clientModel = $this->getClientBuilder()->firstWhere($this->getClientLtiKeyColumn(), $platform->getKey());
+            if (! $clientModel) {
                 return false;
             }
 
-            $client->fillLtiPlatform($platform);
+            $clientModel->fillLtiPlatform($platform);
 
             return true;
         }
@@ -114,29 +116,29 @@ class ModelDataConnector extends DataConnector
         return false;
     }
 
-    public function savePlatform(Platform $platform): bool
+    public function savePlatform(CelticPlatform $platform): bool
     {
         if (! empty($platform->getRecordId())) {
-            /** @var (LtiClient&Model)|null $client */
-            $client = $this->getClientBuilder()->firstWhere($this->getClientLtiRecordIdColumn(), $platform->getRecordId());
-            if (! $client) {
+            /** @var (Client&Model)|null $clientModel */
+            $clientModel = $this->getClientBuilder()->firstWhere($this->getClientLtiRecordIdColumn(), $platform->getRecordId());
+            if (! $clientModel) {
                 return false;
             }
 
             $this->fixPlatformSettings($platform, true);
-            $client->fillFromLtiPlatform($platform);
+            $clientModel->fillFromLtiPlatform($platform);
             $this->fixPlatformSettings($platform, false);
-            $client->save();
+            $clientModel->save();
         } else {
             return false;
         }
 
-        $platform->updated = $client->updated_at->getTimestamp();
+        $platform->updated = $clientModel->updated_at->getTimestamp();
 
         return true;
     }
 
-    public function deletePlatform(Platform $platform): bool
+    public function deletePlatform(CelticPlatform $platform): bool
     {
         return false;
     }
@@ -146,41 +148,43 @@ class ModelDataConnector extends DataConnector
      */
     public function getPlatforms(): array
     {
-        /** @var Collection<int,LtiClient> $clients. */
-        $clients = $this->getClientBuilder()->get();
+        /** @var Collection<int,Client> $clientModels */
+        $clientModels = $this->getClientBuilder()->get();
 
-        return $clients->map(function (LtiClient $client) {
-            $platform = new Platform($this);
-            $client->fillLtiPlatform($platform);
+        return $clientModels->map(function (Client $clientModel) {
+            $platform = new CelticPlatform($this);
+            $clientModel->fillLtiPlatform($platform);
         })->values()->toArray();
     }
 
-    public function loadContext(Context $context): bool
+    public function loadContext(CelticContext $context): bool
     {
         if (! empty($context->getRecordId())) {
-            /** @var \Swis\Laravel\LtiProvider\Models\LtiContext|null $ltiContext */
-            $ltiContext = $this->environment->contexts()->with('client')->find($context->getRecordId());
-            if (! $ltiContext) {
+            /** @var \Swis\Laravel\LtiProvider\Models\Context|null $contextModel */
+            $contextModel = $this->environment->contexts()
+                ->with('client')
+                ->find($context->getRecordId());
+            if (! $contextModel) {
                 return false;
             }
 
-            $ltiContext->fillLtiContext($context);
+            $contextModel->fillLtiContext($context);
 
             return true;
         }
 
         if (! empty($context->ltiContextId)) {
-            /** @var \Swis\Laravel\LtiProvider\Models\LtiContext|null $ltiContext */
-            $ltiContext = $this->environment->contexts()->with('client')
+            /** @var \Swis\Laravel\LtiProvider\Models\Context|null $contextModel */
+            $contextModel = $this->environment->contexts()
+                ->with('client')
                 ->where('external_context_id', $context->ltiContextId)
                 ->where('client_id', $this->getClientForeignKeyFromPlatform($context->getPlatform()))
                 ->first();
-
-            if (! $ltiContext) {
+            if (! $contextModel) {
                 return false;
             }
 
-            $ltiContext->fillLtiContext($context);
+            $contextModel->fillLtiContext($context);
 
             return true;
         }
@@ -188,42 +192,42 @@ class ModelDataConnector extends DataConnector
         return false;
     }
 
-    public function saveContext(Context $context): bool
+    public function saveContext(CelticContext $context): bool
     {
         if (! empty($context->getRecordId())) {
-            /** @var \Swis\Laravel\LtiProvider\Models\LtiContext|null $ltiContext */
-            $ltiContext = $this->environment->contexts()->find($context->getRecordId());
-            if (! $ltiContext) {
+            /** @var \Swis\Laravel\LtiProvider\Models\Context|null $contextModel */
+            $contextModel = $this->environment->contexts()->find($context->getRecordId());
+            if (! $contextModel) {
                 return false;
             }
 
-            $ltiContext->fillFromLtiContext($context);
-            $ltiContext->save();
+            $contextModel->fillFromLtiContext($context);
+            $contextModel->save();
         } else {
-            /** @var \Swis\Laravel\LtiProvider\Models\LtiContext|null $ltiContext */
-            $ltiContext = $this->environment->contexts()->make();
-            $ltiContext->fillFromLtiContext($context);
-            $ltiContext->save();
+            /** @var \Swis\Laravel\LtiProvider\Models\Context|null $contextModel */
+            $contextModel = $this->environment->contexts()->make();
+            $contextModel->fillFromLtiContext($context);
+            $contextModel->save();
 
-            $context->setRecordId($ltiContext->id);
-            $context->created = $ltiContext->created_at->getTimestamp();
+            $context->setRecordId($contextModel->id);
+            $context->created = $contextModel->created_at->getTimestamp();
         }
 
-        $context->updated = $ltiContext->updated_at->getTimestamp();
+        $context->updated = $contextModel->updated_at->getTimestamp();
 
         return true;
     }
 
-    public function deleteContext(Context $context): bool
+    public function deleteContext(CelticContext $context): bool
     {
         if (! empty($context->getRecordId())) {
-            /** @var \Swis\Laravel\LtiProvider\Models\LtiContext|null $ltiContext */
-            $ltiContext = $this->environment->contexts()->find($context->getRecordId());
-            if (! $ltiContext) {
+            /** @var \Swis\Laravel\LtiProvider\Models\Context|null $contextModel */
+            $contextModel = $this->environment->contexts()->find($context->getRecordId());
+            if (! $contextModel) {
                 return false;
             }
 
-            $ltiContext->delete();
+            $contextModel->delete();
 
             return true;
         }
@@ -231,23 +235,27 @@ class ModelDataConnector extends DataConnector
         return false;
     }
 
-    public function loadResourceLink(ResourceLink $resourceLink): bool
+    public function loadResourceLink(CelticResourceLink $resourceLink): bool
     {
         if (! empty($resourceLink->getRecordId())) {
-            /** @var \Swis\Laravel\LtiProvider\Models\LtiResourceLink|null $ltiResourceLink */
-            $ltiResourceLink = $this->environment->resourceLinks()->with('client')->find($resourceLink->getRecordId());
-            if (! $ltiResourceLink) {
+            /** @var \Swis\Laravel\LtiProvider\Models\ResourceLink|null $resourceLinkModel */
+            $resourceLinkModel = $this->environment->resourceLinks()
+                ->with('client')
+                ->find($resourceLink->getRecordId());
+            if (! $resourceLinkModel) {
                 return false;
             }
 
-            $ltiResourceLink->fillLtiResourceLink($resourceLink);
+            $resourceLinkModel->fillLtiResourceLink($resourceLink);
 
             return true;
         }
 
         if (! empty($resourceLink->getContext())) {
-            /** @var \Swis\Laravel\LtiProvider\Models\LtiResourceLink|null $ltiResourceLink */
-            $ltiResourceLink = $this->environment->resourceLinks()->with('client')->where('external_resource_link_id', $resourceLink->ltiResourceLinkId)
+            /** @var \Swis\Laravel\LtiProvider\Models\ResourceLink|null $resourceLinkModel */
+            $resourceLinkModel = $this->environment->resourceLinks()
+                ->with('client')
+                ->where('external_resource_link_id', $resourceLink->ltiResourceLinkId)
                 ->where(function ($query) use ($resourceLink) {
                     $query
                         ->where('lti_context_id', $resourceLink->getContext()->getRecordId())
@@ -259,18 +267,19 @@ class ModelDataConnector extends DataConnector
                         });
                 })
                 ->first();
-
-            if (! $ltiResourceLink) {
+            if (! $resourceLinkModel) {
                 return false;
             }
 
-            $ltiResourceLink->fillLtiResourceLink($resourceLink);
+            $resourceLinkModel->fillLtiResourceLink($resourceLink);
 
             return true;
         }
 
-        /** @var \Swis\Laravel\LtiProvider\Models\LtiResourceLink|null $ltiResourceLink */
-        $ltiResourceLink = $this->environment->resourceLinks()->with('client')->where('external_resource_link_id', $resourceLink->ltiResourceLinkId)
+        /** @var \Swis\Laravel\LtiProvider\Models\ResourceLink|null $resourceLinkModel */
+        $resourceLinkModel = $this->environment->resourceLinks()
+            ->with('client')
+            ->where('external_resource_link_id', $resourceLink->ltiResourceLinkId)
             ->where(function ($query) use ($resourceLink) {
                 $query
                     ->where('client_id', $this->getClientForeignKeyFromPlatform($resourceLink->getPlatform()))
@@ -279,51 +288,51 @@ class ModelDataConnector extends DataConnector
                     });
             })
             ->first();
-        if (! $ltiResourceLink) {
+        if (! $resourceLinkModel) {
             return false;
         }
 
-        $ltiResourceLink->fillLtiResourceLink($resourceLink);
+        $resourceLinkModel->fillLtiResourceLink($resourceLink);
 
         return true;
     }
 
-    public function saveResourceLink(ResourceLink $resourceLink): bool
+    public function saveResourceLink(CelticResourceLink $resourceLink): bool
     {
         if (! empty($resourceLink->getRecordId())) {
-            /** @var \Swis\Laravel\LtiProvider\Models\LtiResourceLink|null $ltiResourceLink */
-            $ltiResourceLink = $this->environment->resourceLinks()->find($resourceLink->getRecordId());
-            if (! $ltiResourceLink) {
+            /** @var \Swis\Laravel\LtiProvider\Models\ResourceLink|null $resourceLinkModel */
+            $resourceLinkModel = $this->environment->resourceLinks()->find($resourceLink->getRecordId());
+            if (! $resourceLinkModel) {
                 return false;
             }
 
-            $ltiResourceLink->fillFromLtiResourceLink($resourceLink);
-            $ltiResourceLink->save();
+            $resourceLinkModel->fillFromLtiResourceLink($resourceLink);
+            $resourceLinkModel->save();
         } else {
-            /** @var \Swis\Laravel\LtiProvider\Models\LtiResourceLink|null $ltiResourceLink */
-            $ltiResourceLink = $this->environment->resourceLinks()->make();
-            $ltiResourceLink->fillFromLtiResourceLink($resourceLink);
-            $ltiResourceLink->save();
+            /** @var \Swis\Laravel\LtiProvider\Models\ResourceLink|null $resourceLinkModel */
+            $resourceLinkModel = $this->environment->resourceLinks()->make();
+            $resourceLinkModel->fillFromLtiResourceLink($resourceLink);
+            $resourceLinkModel->save();
 
-            $resourceLink->setRecordId($ltiResourceLink->id);
-            $resourceLink->created = $ltiResourceLink->created_at->getTimestamp();
+            $resourceLink->setRecordId($resourceLinkModel->id);
+            $resourceLink->created = $resourceLinkModel->created_at->getTimestamp();
         }
 
-        $resourceLink->updated = $ltiResourceLink->updated_at->getTimestamp();
+        $resourceLink->updated = $resourceLinkModel->updated_at->getTimestamp();
 
         return true;
     }
 
-    public function deleteResourceLink(ResourceLink $resourceLink): bool
+    public function deleteResourceLink(CelticResourceLink $resourceLink): bool
     {
         if (! empty($resourceLink->getRecordId())) {
-            /** @var \Swis\Laravel\LtiProvider\Models\LtiResourceLink|null $ltiResourceLink */
-            $ltiResourceLink = $this->environment->resourceLinks()->find($resourceLink->getRecordId());
-            if (! $ltiResourceLink) {
+            /** @var \Swis\Laravel\LtiProvider\Models\ResourceLink|null $resourceLinkModel */
+            $resourceLinkModel = $this->environment->resourceLinks()->find($resourceLink->getRecordId());
+            if (! $resourceLinkModel) {
                 return false;
             }
 
-            $ltiResourceLink->delete();
+            $resourceLinkModel->delete();
             $resourceLink->initialize();
 
             return true;
@@ -335,25 +344,29 @@ class ModelDataConnector extends DataConnector
     /**
      * @return \ceLTIc\LTI\UserResult[]
      */
-    public function getUserResultSourcedIDsResourceLink(ResourceLink $resourceLink, bool $localOnly, ?IdScope $idScope): array
+    public function getUserResultSourcedIDsResourceLink(CelticResourceLink $resourceLink, bool $localOnly, ?IdScope $idScope): array
     {
-        /** @var Collection<int,LtiUserResult> $userResults */
-        $userResults = $this->environment->userResults()->where('lti_resource_link_id', $resourceLink->getRecordId())
-            ->get()->values();
-        $userResults = $userResults->map(function (LtiUserResult $ltiUserResult) use ($resourceLink) {
-            $userResult = new UserResult();
+        /** @var Collection<int,UserResult> $userResultModels */
+        $userResultModels = $this->environment->userResults()
+            ->where('lti_resource_link_id', $resourceLink->getRecordId())
+            ->get()
+            ->values();
+
+        /** @var Collection<int,CelticUserResult> $userResults */
+        $userResults = $userResultModels->map(function (UserResult $userResultModel) use ($resourceLink): CelticUserResult {
+            $userResult = new CelticUserResult();
 
             $userResult->setDataConnector($this);
             $userResult->setResourceLinkId($resourceLink->getRecordId());
             $userResult->setResourceLink($resourceLink);
 
-            $ltiUserResult->fillLtiUserResult($userResult);
+            $userResultModel->fillLtiUserResult($userResult);
 
             return $userResult;
         });
 
         if (! is_null($idScope)) {
-            return $userResults->mapWithKeys(function (UserResult $userResult) use ($idScope) {
+            return $userResults->mapWithKeys(function (CelticUserResult $userResult) use ($idScope) {
                 return [$userResult->getId($idScope) => $userResult];
             })->toArray();
         }
@@ -361,94 +374,96 @@ class ModelDataConnector extends DataConnector
         return $userResults->toArray();
     }
 
-    public function getSharesResourceLink(ResourceLink $resourceLink): array
+    public function getSharesResourceLink(CelticResourceLink $resourceLink): array
     {
         return [];
     }
 
-    public function loadPlatformNonce(PlatformNonce $nonce): bool
+    public function loadPlatformNonce(CelticNonce $nonce): bool
     {
         if (parent::useMemcache()) {
             return parent::loadPlatformNonce($nonce);
         }
 
-        /** @var \Swis\Laravel\LtiProvider\Models\LtiNonce|null $ltiNonce */
-        $ltiNonce = $this->environment->nonces()->where('client_id', $this->getClientForeignKeyFromPlatform($nonce->getPlatform()))
+        /** @var \Swis\Laravel\LtiProvider\Models\Nonce|null $nonceModel */
+        $nonceModel = $this->environment->nonces()
+            ->where('client_id', $this->getClientForeignKeyFromPlatform($nonce->getPlatform()))
             ->where('nonce', $nonce->getValue())
             ->where('expires_at', '>', Carbon::now())
             ->first();
 
-        if (! $ltiNonce) {
+        if (! $nonceModel) {
             return false;
         }
 
-        $ltiNonce->fillLtiPlatformNonce($nonce);
+        $nonceModel->fillLtiPlatformNonce($nonce);
 
         return true;
     }
 
-    public function savePlatformNonce(PlatformNonce $nonce): bool
+    public function savePlatformNonce(CelticNonce $nonce): bool
     {
         if (parent::useMemcache()) {
             return parent::savePlatformNonce($nonce);
         }
 
-        /** @var \Swis\Laravel\LtiProvider\Models\LtiNonce $ltiNonce */
-        $ltiNonce = $this->environment->nonces()->firstOrNew([
+        /** @var \Swis\Laravel\LtiProvider\Models\Nonce $nonceModel */
+        $nonceModel = $this->environment->nonces()->firstOrNew([
             'client_id' => $this->getClientForeignKeyFromPlatform($nonce->getPlatform()),
             'nonce' => $nonce->getValue(),
         ]);
 
-        $ltiNonce->fillFromLtiPlatformNonce($nonce);
-        $ltiNonce->save();
+        $nonceModel->fillFromLtiPlatformNonce($nonce);
+        $nonceModel->save();
 
         return true;
     }
 
-    public function deletePlatformNonce(PlatformNonce $nonce): bool
+    public function deletePlatformNonce(CelticNonce $nonce): bool
     {
         if (parent::useMemcache()) {
             return parent::deletePlatformNonce($nonce);
         }
 
-        $this->environment->nonces()->where('client_id', $this->getClientForeignKeyFromPlatform($nonce->getPlatform()))
+        $this->environment->nonces()
+            ->where('client_id', $this->getClientForeignKeyFromPlatform($nonce->getPlatform()))
             ->where('nonce', $nonce->getValue())
             ->delete();
 
         return true;
     }
 
-    public function loadAccessToken(AccessToken $accessToken): bool
+    public function loadAccessToken(CelticAccessToken $accessToken): bool
     {
         if (parent::useMemcache()) {
             return parent::loadAccessToken($accessToken);
         }
 
-        /** @var \Swis\Laravel\LtiProvider\Models\LtiAccessToken|null $ltiAccessToken */
-        $ltiAccessToken = $this->environment->accessTokens()->where('client_id', $this->getClientForeignKeyFromPlatform($accessToken->getPlatform()))
+        /** @var \Swis\Laravel\LtiProvider\Models\AccessToken|null $accessTokenModel */
+        $accessTokenModel = $this->environment->accessTokens()
+            ->where('client_id', $this->getClientForeignKeyFromPlatform($accessToken->getPlatform()))
             ->first();
-
-        if (! $ltiAccessToken) {
+        if (! $accessTokenModel) {
             return false;
         }
 
-        $ltiAccessToken->fillLtiAccessToken($accessToken);
+        $accessTokenModel->fillLtiAccessToken($accessToken);
 
         return true;
     }
 
-    public function saveAccessToken(AccessToken $accessToken): bool
+    public function saveAccessToken(CelticAccessToken $accessToken): bool
     {
         if (parent::useMemcache()) {
             return parent::saveAccessToken($accessToken);
         }
 
-        /** @var \Swis\Laravel\LtiProvider\Models\LtiAccessToken $ltiAccessToken */
-        $ltiAccessToken = $this->environment->accessTokens()->firstOrNew([
+        /** @var \Swis\Laravel\LtiProvider\Models\AccessToken $accessTokenModel */
+        $accessTokenModel = $this->environment->accessTokens()->firstOrNew([
             'client_id' => $this->getClientForeignKeyFromPlatform($accessToken->getPlatform()),
         ]);
-        $ltiAccessToken->fillFromLtiAccessToken($accessToken);
-        $ltiAccessToken->save();
+        $accessTokenModel->fillFromLtiAccessToken($accessToken);
+        $accessTokenModel->save();
 
         return true;
     }
@@ -468,71 +483,72 @@ class ModelDataConnector extends DataConnector
         return false;
     }
 
-    public function loadUserResult(UserResult $userResult): bool
+    public function loadUserResult(CelticUserResult $userResult): bool
     {
         if (! empty($userResult->getRecordId())) {
-            /** @var \Swis\Laravel\LtiProvider\Models\LtiUserResult|null $ltiUserResult */
-            $ltiUserResult = $this->environment->userResults()->find($userResult->getRecordId());
-            if (! $ltiUserResult) {
+            /** @var \Swis\Laravel\LtiProvider\Models\UserResult|null $userResultModel */
+            $userResultModel = $this->environment->userResults()->find($userResult->getRecordId());
+            if (! $userResultModel) {
                 return false;
             }
 
-            $ltiUserResult->fillLtiUserResult($userResult);
+            $userResultModel->fillLtiUserResult($userResult);
 
             return true;
         }
 
-        /** @var \Swis\Laravel\LtiProvider\Models\LtiUserResult|null $ltiUserResult */
-        $ltiUserResult = $this->environment->userResults()->where('lti_resource_link_id', $userResult->getResourceLink()->getRecordId())
+        /** @var \Swis\Laravel\LtiProvider\Models\UserResult|null $userResultModel */
+        $userResultModel = $this->environment->userResults()
+            ->where('lti_resource_link_id', $userResult->getResourceLink()->getRecordId())
             ->where('external_user_id', $userResult->getId(IdScope::IdOnly))
             ->first();
-        if (! $ltiUserResult) {
+        if (! $userResultModel) {
             return false;
         }
 
-        $ltiUserResult->fillLtiUserResult($userResult);
+        $userResultModel->fillLtiUserResult($userResult);
 
         return true;
     }
 
-    public function saveUserResult(UserResult $userResult): bool
+    public function saveUserResult(CelticUserResult $userResult): bool
     {
         if (is_null($userResult->created)) {
-            /** @var \Swis\Laravel\LtiProvider\Models\LtiUserResult $ltiUserResult */
-            $ltiUserResult = $this->environment->userResults()->make();
-            $ltiUserResult->fillFromLtiUserResult($userResult);
-            $ltiUserResult->save();
+            /** @var \Swis\Laravel\LtiProvider\Models\UserResult $userResultModel */
+            $userResultModel = $this->environment->userResults()->make();
+            $userResultModel->fillFromLtiUserResult($userResult);
+            $userResultModel->save();
 
-            $userResult->setRecordId($ltiUserResult->id);
-            $userResult->created = $ltiUserResult->created_at->getTimestamp();
-            $userResult->updated = $ltiUserResult->updated_at->getTimestamp();
+            $userResult->setRecordId($userResultModel->id);
+            $userResult->created = $userResultModel->created_at->getTimestamp();
+            $userResult->updated = $userResultModel->updated_at->getTimestamp();
 
             return true;
         }
 
-        /** @var \Swis\Laravel\LtiProvider\Models\LtiUserResult|null $ltiUserResult */
-        $ltiUserResult = $this->environment->userResults()->find($userResult->getRecordId());
-        if (! $ltiUserResult) {
+        /** @var \Swis\Laravel\LtiProvider\Models\UserResult|null $userResultModel */
+        $userResultModel = $this->environment->userResults()->find($userResult->getRecordId());
+        if (! $userResultModel) {
             return false;
         }
 
-        $ltiUserResult->fillFromLtiUserResult($userResult);
-        $ltiUserResult->save();
+        $userResultModel->fillFromLtiUserResult($userResult);
+        $userResultModel->save();
 
-        $userResult->updated = $ltiUserResult->updated_at->getTimestamp();
+        $userResult->updated = $userResultModel->updated_at->getTimestamp();
 
         return true;
     }
 
-    public function deleteUserResult(UserResult $userResult): bool
+    public function deleteUserResult(CelticUserResult $userResult): bool
     {
-        /** @var \Swis\Laravel\LtiProvider\Models\LtiUserResult|null $ltiUserResult */
-        $ltiUserResult = $this->environment->userResults()->find($userResult->getRecordId());
-        if (! $ltiUserResult) {
+        /** @var \Swis\Laravel\LtiProvider\Models\UserResult|null $userResultModel */
+        $userResultModel = $this->environment->userResults()->find($userResult->getRecordId());
+        if (! $userResultModel) {
             return false;
         }
 
-        $ltiUserResult->delete();
+        $userResultModel->delete();
 
         return true;
     }
@@ -562,7 +578,7 @@ class ModelDataConnector extends DataConnector
 
     public static function make(LtiEnvironment $environment): static
     {
-        $clientClassName = config('lti-provider.class-names.lti-client');
+        $clientClassName = config('lti-provider.class-names.client');
         if ($clientClassName === '') {
             abort(500, 'please provide an lti client in the lti-provider config');
         }
@@ -575,8 +591,8 @@ class ModelDataConnector extends DataConnector
             abort(500, 'Lti client class must be a subclass of '.Model::class);
         }
 
-        if (! is_subclass_of($clientClassName, LtiClient::class)) {
-            abort(500, 'Lti client class must be an implementation of '.LtiClient::class);
+        if (! is_subclass_of($clientClassName, Client::class)) {
+            abort(500, 'Lti client class must be an implementation of '.Client::class);
         }
 
         return new static($environment, $clientClassName);
