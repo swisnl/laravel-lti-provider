@@ -20,7 +20,7 @@ $ composer require swisnl/laravel-lti-provider
 Then run command to copy the required files into your project.
 
 ```bash
-php artisan lti-service-provider:install
+php artisan lti-provider:install
 ```
 
 If you have Laravel package auto discovery disabled, add the service provider to your `config/app.php` file:
