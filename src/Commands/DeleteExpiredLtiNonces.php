@@ -3,7 +3,6 @@
 namespace Swis\Laravel\LtiProvider\Commands;
 
 use Illuminate\Console\Command;
-use Swis\Laravel\LtiProvider\Models\LtiNonce;
 
 class DeleteExpiredLtiNonces extends Command
 {
@@ -13,7 +12,7 @@ class DeleteExpiredLtiNonces extends Command
 
     public function handle(): int
     {
-        LtiNonce::deleteExpired();
+        config('lti-provider.class-names.lti-nonce')::deleteExpired();
 
         return static::SUCCESS;
     }
