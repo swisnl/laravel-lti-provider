@@ -14,27 +14,37 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 interface LtiClient
 {
+    public static function getLtiRecordIdColumn(): string;
+
+    public static function getLtiKeyColumn(): string;
+
+    public static function getForeignKeyFromPlatform(Platform $platform): int|string;
+
+    public function getLtiRecordId(): ?int;
+
+    public function getLtiKey(): string;
+
     public function fillLtiPlatform(Platform $platform): void;
 
     public function fillFromLtiPlatform(Platform $platform): void;
 
     /**
-     * @return HasMany<\Illuminate\Database\Eloquent\Model>
+     * @return HasMany<\Swis\Laravel\LtiProvider\Models\LtiResourceLink>
      */
     public function resourceLinks(): HasMany;
 
     /**
-     * @return HasMany<\Illuminate\Database\Eloquent\Model>
+     * @return HasMany<\Swis\Laravel\LtiProvider\Models\LtiContext>
      */
     public function contexts(): HasMany;
 
     /**
-     * @return HasMany<\Illuminate\Database\Eloquent\Model>
+     * @return HasMany<\Swis\Laravel\LtiProvider\Models\LtiNonce>
      */
     public function nonces(): HasMany;
 
     /**
-     * @return HasMany<\Illuminate\Database\Eloquent\Model>
+     * @return HasMany<\Swis\Laravel\LtiProvider\Models\LtiAccessToken>
      */
     public function accessTokens(): HasMany;
 }

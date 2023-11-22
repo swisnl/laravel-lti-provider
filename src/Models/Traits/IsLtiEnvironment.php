@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Swis\Laravel\LtiProvider\Models\Traits;
 
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Swis\Laravel\LtiProvider\ModelDataConnector;
 
 trait IsLtiEnvironment
@@ -11,45 +12,45 @@ trait IsLtiEnvironment
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Swis\Laravel\LtiProvider\Models\LtiAccessToken>
      */
-    public function accessTokens(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    public function accessTokens(): MorphMany
     {
-        return $this->morphMany(\Swis\Laravel\LtiProvider\Models\LtiAccessToken::class, 'lti_environment');
+        return $this->morphMany(config('lti-provider.class-names.lti-access-token'), 'lti_environment');
     }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Swis\Laravel\LtiProvider\Models\LtiContext>
      */
-    public function contexts(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    public function contexts(): MorphMany
     {
-        return $this->morphMany(\Swis\Laravel\LtiProvider\Models\LtiContext::class, 'lti_environment');
+        return $this->morphMany(config('lti-provider.class-names.lti-context'), 'lti_environment');
     }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Swis\Laravel\LtiProvider\Models\LtiNonce>
      */
-    public function nonces(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    public function nonces(): MorphMany
     {
-        return $this->morphMany(\Swis\Laravel\LtiProvider\Models\LtiNonce::class, 'lti_environment');
+        return $this->morphMany(config('lti-provider.class-names.lti-nonce'), 'lti_environment');
     }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Swis\Laravel\LtiProvider\Models\LtiResourceLink>
      */
-    public function resourceLinks(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    public function resourceLinks(): MorphMany
     {
-        return $this->morphMany(\Swis\Laravel\LtiProvider\Models\LtiResourceLink::class, 'lti_environment');
+        return $this->morphMany(config('lti-provider.class-names.lti-resource-link'), 'lti_environment');
     }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Swis\Laravel\LtiProvider\Models\LtiUserResult>
      */
-    public function userResults(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    public function userResults(): MorphMany
     {
-        return $this->morphMany(\Swis\Laravel\LtiProvider\Models\LtiUserResult::class, 'lti_environment');
+        return $this->morphMany(config('lti-provider.class-names.lti-user-result'), 'lti_environment');
     }
 
     public function getDataConnector(): ModelDataConnector
     {
-        return new \Swis\Laravel\LtiProvider\ModelDataConnector($this);
+        return ModelDataConnector::make($this);
     }
 }

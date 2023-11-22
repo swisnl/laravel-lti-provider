@@ -1,4 +1,4 @@
-# laravel-lti-provider
+# Laravel LTI Provider
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE.md)
@@ -7,22 +7,49 @@
 [![Total Downloads][ico-downloads]][link-downloads]
 [![Made by SWIS][ico-swis]][link-swis]
 
+This packages provides a bridge between the Celtic LTI Provider and Laravel models.
 
-
-
-## Install
+## Install & Setup
 
 Via Composer
 
 ``` bash
 $ composer require swisnl/laravel-lti-provider
 ```
-## Usage
-Run 
+
+Then run command to copy the required files into your project.
+
 ```bash
 php artisan lti-service-provider:install
 ```
-implemnent the LtiClient interface to your oauth2 client model. Implement the methods and add the required attributes
+
+If you have Laravel package auto discovery disabled, add the service provider to your `config/app.php` file:
+
+```php
+'providers' => [
+    // ...
+    Swis\Laravel\Lti\Providers\LtiServiceProvider::class,
+];
+```
+
+The package comes with a very basic client implementation, but allows for overriding this implementation. To do so,
+create a new class that implements the `Swis\Laravel\Lti\Contracts\LtiClient` interface and change the following to your
+`config/lti-provider.php` file:
+
+```php
+        'lti-client' => 'REFERENCE TO YOUR NEW CLASS',
+```
+
+For inspiration on how to implement your own client, take a look at the `Swis\Laravel\Lti\Models\SimpleClient` class
+(the very basic implementation) or the `\Workbench\App\OverrideModels\Client` class (this is a more complex example used
+in the tests to check if it is possible to override the default implementation and if the package can handle clients 
+with UUIDs instead of numeric ids).
+
+After you have set up your client, you can run the migrations to create the required tables:
+
+```bash
+php artisan migrate
+```
 
 ## Change log
 

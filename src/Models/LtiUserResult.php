@@ -8,21 +8,15 @@ use ceLTIc\LTI\Enum\IdScope;
 use ceLTIc\LTI\UserResult;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Swis\Laravel\LtiProvider\Models\Contracts\LtiUserResult as LtiUserResultInterface;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 
 /**
- * \Swis\Laravel\LtiProvider\Models\LtiUserResult.
- *
  * @property int                                              $id
- * @property string                                           $lti_environment_type
- * @property string                                           $lti_environment_id
  * @property int                                              $lti_resource_link_id
  * @property string                                           $external_user_id
  * @property string                                           $external_user_result_id
  * @property \Illuminate\Support\Carbon|null                  $created_at
  * @property \Illuminate\Support\Carbon|null                  $updated_at
- * @property \Illuminate\Database\Eloquent\Model              $ltiEnvironment
  * @property \Swis\Laravel\LtiProvider\Models\LtiResourceLink $resourceLink
  *
  * @method static \Illuminate\Database\Eloquent\Builder|LtiUserResult newModelQuery()
@@ -32,18 +26,18 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
  * @method static \Illuminate\Database\Eloquent\Builder|LtiUserResult whereExternalUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LtiUserResult whereExternalUserResultId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LtiUserResult whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LtiUserResult whereLtiEnvironmentId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LtiUserResult whereLtiEnvironmentType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LtiUserResult whereLtiResourceLinkId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LtiUserResult whereUpdatedAt($value)
- *
- * @mixin \Eloquent
  */
-class LtiUserResult extends Model implements LtiUserResultInterface
+class LtiUserResult extends Model
 {
     use HasLtiEnvironment;
 
+    protected $table = 'lti_user_results';
+
     protected $fillable = [
+        'lti_environment_type',
+        'lti_environment_id',
         'lti_resource_link_id',
         'external_user_id',
         'external_user_result_id',
@@ -71,6 +65,6 @@ class LtiUserResult extends Model implements LtiUserResultInterface
      */
     public function resourceLink(): BelongsTo
     {
-        return $this->belongsTo(\Swis\Laravel\LtiProvider\Models\LtiResourceLink::class, 'lti_resource_link_id');
+        return $this->belongsTo(config('lti-provider.class-names.lti-resource-link'), 'lti_resource_link_id');
     }
 }
