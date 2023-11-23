@@ -28,7 +28,7 @@ If you have Laravel package auto discovery disabled, add the service provider to
 ```php
 'providers' => [
     // ...
-    Swis\Laravel\Lti\Providers\LtiServiceProvider::class,
+    Swis\Laravel\Lti\Providers\LtiProviderServiceProvider::class,
 ];
 ```
 

@@ -63,7 +63,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Swis\\Laravel\\LtiProvider\\LtiServiceProvider"
+                "Swis\\Laravel\\LtiProvider\\LtiProviderServiceProvider"
             ]
         }
     },

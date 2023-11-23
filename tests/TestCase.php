@@ -4,7 +4,7 @@ namespace Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Swis\Laravel\LtiProvider\LtiServiceProvider;
+use Swis\Laravel\LtiProvider\LtiProviderServiceProvider;
 
 use function Orchestra\Testbench\package_path;
 use function Orchestra\Testbench\workbench_path;
@@ -34,7 +34,7 @@ class TestCase extends Orchestra
     protected function getPackageProviders($app): array
     {
         return [
-            LtiServiceProvider::class,
+            LtiProviderServiceProvider::class,
         ];
     }
 

@@ -9,7 +9,7 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Swis\Laravel\LtiProvider\Commands\DeleteExpiredLtiNonces;
 
-class LtiServiceProvider extends PackageServiceProvider
+class LtiProviderServiceProvider extends PackageServiceProvider
 {
     public function configurePackage(Package $package): void
     {
@@ -19,7 +19,7 @@ class LtiServiceProvider extends PackageServiceProvider
                 '2023_10_26_100000_add_client_table',
                 '2023_10_26_200000_add_lti_tables'
             )
-            ->publishesServiceProvider('LtiServiceProvider')
+            ->publishesServiceProvider('LtiProviderServiceProvider')
             ->hasConfigFile()
             ->hasCommand(DeleteExpiredLtiNonces::class)
             ->hasInstallCommand(function (InstallCommand $command) {
