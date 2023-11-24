@@ -19,7 +19,6 @@ class LtiProviderServiceProvider extends PackageServiceProvider
                 '2023_10_26_100000_add_client_table',
                 '2023_10_26_200000_add_lti_tables'
             )
-            ->publishesServiceProvider('LtiProviderServiceProvider')
             ->hasConfigFile()
             ->hasCommand(DeleteExpiredLtiNonces::class)
             ->hasInstallCommand(function (InstallCommand $command) {
