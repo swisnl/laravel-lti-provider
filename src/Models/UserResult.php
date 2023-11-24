@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Swis\Laravel\LtiProvider\Models;
 
 use ceLTIc\LTI\Enum\IdScope;
-use ceLTIc\LTI\UserResult;
+use ceLTIc\LTI\UserResult as CelticUserResult;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
@@ -17,19 +17,19 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
  * @property string                                           $external_user_result_id
  * @property \Illuminate\Support\Carbon|null                  $created_at
  * @property \Illuminate\Support\Carbon|null                  $updated_at
- * @property \Swis\Laravel\LtiProvider\Models\LtiResourceLink $resourceLink
+ * @property \Swis\Laravel\LtiProvider\Models\ResourceLink $resourceLink
  *
- * @method static \Illuminate\Database\Eloquent\Builder|LtiUserResult newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|LtiUserResult newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|LtiUserResult query()
- * @method static \Illuminate\Database\Eloquent\Builder|LtiUserResult whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LtiUserResult whereExternalUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LtiUserResult whereExternalUserResultId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LtiUserResult whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LtiUserResult whereLtiResourceLinkId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LtiUserResult whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserResult newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserResult newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserResult query()
+ * @method static \Illuminate\Database\Eloquent\Builder|UserResult whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserResult whereExternalUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserResult whereExternalUserResultId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserResult whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserResult whereLtiResourceLinkId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserResult whereUpdatedAt($value)
  */
-class LtiUserResult extends Model
+class UserResult extends Model
 {
     use HasLtiEnvironment;
 
@@ -43,7 +43,7 @@ class LtiUserResult extends Model
         'external_user_result_id',
     ];
 
-    public function fillLtiUserResult(UserResult $userResult): void
+    public function fillLtiUserResult(CelticUserResult $userResult): void
     {
         $userResult->setRecordId($this->id);
 
@@ -53,7 +53,7 @@ class LtiUserResult extends Model
         $userResult->ltiResultSourcedId = $this->external_user_result_id;
     }
 
-    public function fillFromLtiUserResult(UserResult $userResult): void
+    public function fillFromLtiUserResult(CelticUserResult $userResult): void
     {
         $this->lti_resource_link_id = $userResult->getResourceLink()->getRecordId();
         $this->external_user_id = $userResult->getId(IdScope::IdOnly);
@@ -61,10 +61,10 @@ class LtiUserResult extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Swis\Laravel\LtiProvider\Models\LtiResourceLink, self>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Swis\Laravel\LtiProvider\Models\ResourceLink, self>
      */
     public function resourceLink(): BelongsTo
     {
-        return $this->belongsTo(config('lti-provider.class-names.lti-resource-link'), 'lti_resource_link_id');
+        return $this->belongsTo(config('lti-provider.class-names.resource-link'), 'lti_resource_link_id');
     }
 }

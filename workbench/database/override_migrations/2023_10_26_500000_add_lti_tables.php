@@ -16,7 +16,7 @@ return new class() extends Migration
 
             $table->uuidMorphs('lti_environment');
 
-            $table->foreignUuid('client_id')->constrained('clients')->cascadeOnDelete();
+            $table->foreignUuid('client_id')->constrained('lti_clients')->cascadeOnDelete();
 
             $table->string('nonce', 50);
             $table->dateTime('expires_at');
@@ -31,7 +31,7 @@ return new class() extends Migration
 
             $table->uuidMorphs('lti_environment');
 
-            $table->foreignUuid('client_id')->constrained('clients')->cascadeOnDelete();
+            $table->foreignUuid('client_id')->constrained('lti_clients')->cascadeOnDelete();
 
             $table->string('access_token', 2000);
             $table->text('scopes');
@@ -45,7 +45,7 @@ return new class() extends Migration
 
             $table->uuidMorphs('lti_environment');
 
-            $table->foreignUuid('client_id')->constrained('clients')->cascadeOnDelete();
+            $table->foreignUuid('client_id')->constrained('lti_clients')->cascadeOnDelete();
 
             $table->string('title')->nullable();
             $table->string('external_context_id', 255);
@@ -59,7 +59,7 @@ return new class() extends Migration
 
             $table->uuidMorphs('lti_environment');
 
-            $table->foreignUuid('client_id')->constrained('clients')->cascadeOnDelete();
+            $table->foreignUuid('client_id')->constrained('lti_clients')->cascadeOnDelete();
 
             $table->foreignId('lti_context_id')->nullable()->constrained('lti_contexts')->cascadeOnDelete();
 

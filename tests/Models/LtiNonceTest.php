@@ -4,7 +4,7 @@ namespace Tests\Models;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Swis\Laravel\LtiProvider\Models\LtiNonce;
+use Swis\Laravel\LtiProvider\Models\Nonce;
 use Swis\Laravel\LtiProvider\Models\SimpleClient;
 use Tests\TestCase;
 use Workbench\App\Models\SimpleLtiEnvironment;
@@ -29,7 +29,7 @@ class LtiNonceTest extends TestCase
         ]);
 
         // Act
-        LtiNonce::deleteExpired();
+        Nonce::deleteExpired();
 
         // Assert
         $this->assertDatabaseMissing('lti_nonces', [

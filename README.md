@@ -7,9 +7,10 @@
 [![Total Downloads][ico-downloads]][link-downloads]
 [![Made by SWIS][ico-swis]][link-swis]
 
-This packages provides a bridge between the Celtic LTI Provider and Laravel models.
+This packages provides a bridge between the [Celtic LTI Package](https://github.com/celtic-project/LTI-PHP) and Laravel
+models, by implementing a DataConnector for the Celtic LTI Package.
 
-## Install & Setup
+## Install
 
 Via Composer
 
@@ -17,10 +18,10 @@ Via Composer
 $ composer require swisnl/laravel-lti-provider
 ```
 
-Then run command to copy the required files into your project.
+Then run command to copy the required files (including the migrations) into your project.
 
 ```bash
-php artisan lti-service-provider:install
+php artisan lti-provider:install
 ```
 
 If you have Laravel package auto discovery disabled, add the service provider to your `config/app.php` file:
@@ -28,28 +29,66 @@ If you have Laravel package auto discovery disabled, add the service provider to
 ```php
 'providers' => [
     // ...
-    Swis\Laravel\Lti\Providers\LtiServiceProvider::class,
+    Swis\Laravel\Lti\Providers\LtiProviderServiceProvider::class,
 ];
 ```
 
-The package comes with a very basic client implementation, but allows for overriding this implementation. To do so,
-create a new class that implements the `Swis\Laravel\Lti\Contracts\LtiClient` interface and change the following to your
-`config/lti-provider.php` file:
-
-```php
-        'lti-client' => 'REFERENCE TO YOUR NEW CLASS',
-```
-
-For inspiration on how to implement your own client, take a look at the `Swis\Laravel\Lti\Models\SimpleClient` class
-(the very basic implementation) or the `\Workbench\App\OverrideModels\Client` class (this is a more complex example used
-in the tests to check if it is possible to override the default implementation and if the package can handle clients 
-with UUIDs instead of numeric ids).
-
-After you have set up your client, you can run the migrations to create the required tables:
+Finally run the migrations.
 
 ```bash
 php artisan migrate
 ```
+
+## Cron jobs
+
+The package comes with a command to clean up expired LTI nonces. To run this command, add the following to your
+`app/Console/Kernel.php` file:
+
+```php
+    protected function schedule(Schedule $schedule)
+    {
+        // ...
+        $schedule->command('lti-provider:delete-expired-nonces')->daily();
+    }
+```
+
+## Usage
+
+Define a model that you use as an LTI environment. This model should implement the 
+`Swis\Laravel\Lti\Contracts\LtiEnvironment`. The packages scopes all other models to the current LTI environment. 
+
+Using this this environment, you can create a new `ModelDataConnector` instance. This instance can be used like the
+`DataConnector` from the Celtic LTI Package.
+
+```php
+    $environment = MyLtiEnvironment::find($id);
+    $dataConnector = new ModelDataConnector($environment);
+```
+
+## Customization
+
+This package allows overriding most of the models. We use this to override some models to use UUIDs instead of numeric
+ids, and to add some extra functionality (examples of this extra functionality: adding logging to `UserResult`; and
+using the same `Client` model for both LTI and [Laravel Passport](https://laravel.com/docs/10.x/passport)). 
+
+To override a model (except the client), create a new class that extends the original model and register the new model
+in the `config/lti-provider.php` file. For example, to override the `UserResult` model, create a new class that extends
+the `Swis\Laravel\Lti\Models\UserResult` class and change the following to your `config/lti-provider.php` file:
+
+```php
+        'models' => [
+            'user-result' => 'REFERENCE TO YOUR NEW CLASS',
+        ],
+```
+
+Clients are a bit different, because you don't need to extend from an existing class. To override the client, create a
+new class that implements the `Swis\Laravel\Lti\Contracts\Client` interface and register the new model in the
+`config/lti-provider.php` file.
+
+For inspiration on how to implement your own client, take a look at the `Swis\Laravel\Lti\Models\SimpleClient` class
+(a very basic implementation) or the `\Workbench\App\OverrideModels\Client` class (this is a more complex example used
+in the tests to check if it is possible to override the default implementation and if the package can handle clients 
+with UUIDs instead of numeric ids).
 
 ## Change log
 

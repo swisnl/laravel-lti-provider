@@ -7,15 +7,15 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Swis\Laravel\LtiProvider\Models\SimpleClient;
 use Tests\TestCase;
 
-class ClientTest extends TestCase
+class SimpleLtiClientTest extends TestCase
 {
     use RefreshDatabase;
 
     /** @test */
-    public function it_should_create_simple_client(): void
+    public function it_should_create_simple_lti_client(): void
     {
         Factory::factoryForModel(SimpleClient::class)->create();
 
-        self::assertDatabaseCount('clients', 1);
+        self::assertDatabaseCount('lti_clients', 1);
     }
 }

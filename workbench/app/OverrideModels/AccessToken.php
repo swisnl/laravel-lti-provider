@@ -3,12 +3,12 @@
 namespace Workbench\App\OverrideModels;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Swis\Laravel\LtiProvider\Models\LtiNonce as BaseLtiNonce;
+use Swis\Laravel\LtiProvider\Models\AccessToken as BaseLtiAccessToken;
 
 /**
  * @property string $id
  */
-class LtiNonce extends BaseLtiNonce
+class AccessToken extends BaseLtiAccessToken
 {
     use HasUuids;
 }
