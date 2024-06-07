@@ -16,7 +16,7 @@ class LtiProviderServiceProvider extends PackageServiceProvider
         $package
             ->name('laravel-lti-provider')
             ->hasMigrations(
-                '2023_10_26_100000_add_client_table',
+                '2023_10_26_100000_add_lti_clients_table',
                 '2023_10_26_200000_add_lti_tables'
             )
             ->hasConfigFile()
