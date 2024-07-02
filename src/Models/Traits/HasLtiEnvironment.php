@@ -22,6 +22,6 @@ trait HasLtiEnvironment
     public function ltiEnvironment(): MorphTo
     {
         /** @phpstan-ignore-next-line */
-        return $this->morphTo('lti_environment');
+        return $this->morphTo();
     }
 }
