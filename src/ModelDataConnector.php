@@ -133,7 +133,7 @@ class ModelDataConnector extends DataConnector
             return false;
         }
 
-        $platform->updated = $clientModel->updated_at->getTimestamp();
+        $platform->updated = $clientModel->getAttribute($clientModel->getUpdatedAtColumn())->getTimestamp();
 
         return true;
     }

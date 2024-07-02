@@ -11,9 +11,9 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasClient;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 
 /**
- * @property string                          $id
- * @property string                          $nonce
- * @property \Illuminate\Support\Carbon      $expires_at
+ * @property string $id
+ * @property string $nonce
+ * @property \Illuminate\Support\Carbon $expires_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  *

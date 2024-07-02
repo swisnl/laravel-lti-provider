@@ -7,8 +7,8 @@ namespace Swis\Laravel\LtiProvider\Models\Traits;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
- * @property string                                                                                        $lti_environment_type
- * @property string                                                                                        $lti_environment_id
+ * @property string $lti_environment_type
+ * @property string $lti_environment_id
  * @property \Illuminate\Database\Eloquent\Model&\Swis\Laravel\LtiProvider\Models\Contracts\LtiEnvironment $ltiEnvironment
  *
  * @method static \Illuminate\Database\Eloquent\Builder|static whereLtiEnvironmentId($value)
@@ -22,6 +22,6 @@ trait HasLtiEnvironment
     public function ltiEnvironment(): MorphTo
     {
         /** @phpstan-ignore-next-line */
-        return $this->morphTo('lti_environment');
+        return $this->morphTo();
     }
 }

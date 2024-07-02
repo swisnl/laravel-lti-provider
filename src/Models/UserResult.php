@@ -11,12 +11,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 
 /**
- * @property int                                              $id
- * @property int                                              $lti_resource_link_id
- * @property string                                           $external_user_id
- * @property string                                           $external_user_result_id
- * @property \Illuminate\Support\Carbon|null                  $created_at
- * @property \Illuminate\Support\Carbon|null                  $updated_at
+ * @property int $id
+ * @property int $lti_resource_link_id
+ * @property string $external_user_id
+ * @property string $external_user_result_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Swis\Laravel\LtiProvider\Models\ResourceLink $resourceLink
  *
  * @method static \Illuminate\Database\Eloquent\Builder|UserResult newModelQuery()

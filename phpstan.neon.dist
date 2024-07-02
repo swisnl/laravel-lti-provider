@@ -7,4 +7,3 @@ parameters:
         - tests
         - workbench
     tmpDir: build/phpstan
-    checkMissingIterableValueType: false

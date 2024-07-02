@@ -8,8 +8,8 @@ use ceLTIc\LTI\Platform;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * @property int       $nr
- * @property string    $name
+ * @property int $nr
+ * @property string $name
  * @property \DateTime $updated_at
  */
 interface Client

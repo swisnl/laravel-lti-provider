@@ -5,7 +5,7 @@ namespace Swis\Laravel\LtiProvider\Models\Traits;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * @property string|int                                                                               $client_id
+ * @property string|int $client_id
  * @property \Illuminate\Database\Eloquent\Model&\Swis\Laravel\LtiProvider\Models\Contracts\Client $client
  *
  * @method static \Illuminate\Database\Eloquent\Builder|static whereClientId($value)
