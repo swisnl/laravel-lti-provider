@@ -40,7 +40,7 @@ trait ModelDataConnectorTests
         $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
 
         // Assert
-        $this->assertEquals($client->name, $platform->name);
+        $this->assertEquals($client->getAttribute('name'), $platform->name);
     }
 
     /** @test */

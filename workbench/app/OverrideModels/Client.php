@@ -12,20 +12,20 @@ use Swis\Laravel\LtiProvider\Models\Contracts\Client as ClientContract;
 use Swis\Laravel\LtiProvider\Models\Traits\HasClientCapabilities;
 
 /**
- * @property string                                          $id
- * @property int                                             $nr
- * @property string                                          $name
- * @property string|null                                     $secret
- * @property string|null                                     $public_key
- * @property string|null                                     $lti_platform_id
- * @property string|null                                     $lti_client_id
- * @property string|null                                     $lti_deployment_id
- * @property string|null                                     $lti_version
- * @property string                                          $lti_signature_method
+ * @property string $id
+ * @property int $nr
+ * @property string $name
+ * @property string|null $secret
+ * @property string|null $public_key
+ * @property string|null $lti_platform_id
+ * @property string|null $lti_client_id
+ * @property string|null $lti_deployment_id
+ * @property string|null $lti_version
+ * @property string $lti_signature_method
  * @property \Illuminate\Database\Eloquent\Casts\ArrayObject $lti_profile
  * @property \Illuminate\Database\Eloquent\Casts\ArrayObject $lti_settings
- * @property \Illuminate\Support\Carbon|null                 $created_at
- * @property \Illuminate\Support\Carbon|null                 $updated_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Client newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Client newQuery()

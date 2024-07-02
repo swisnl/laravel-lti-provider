@@ -14,15 +14,15 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasClient;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 
 /**
- * @property int                                              $id
- * @property int|null                                         $lti_context_id
- * @property string|null                                      $title
- * @property string                                           $external_resource_link_id
- * @property \Illuminate\Database\Eloquent\Casts\ArrayObject  $settings
- * @property \Illuminate\Support\Carbon|null                  $created_at
- * @property \Illuminate\Support\Carbon|null                  $updated_at
+ * @property int $id
+ * @property int|null $lti_context_id
+ * @property string|null $title
+ * @property string $external_resource_link_id
+ * @property \Illuminate\Database\Eloquent\Casts\ArrayObject $settings
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Swis\Laravel\LtiProvider\Models\Context|null $context
- * @property int|null                                         $user_results_count
+ * @property int|null $user_results_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder|ResourceLink newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ResourceLink newQuery()
