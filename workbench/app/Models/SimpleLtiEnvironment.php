@@ -23,7 +23,9 @@ use Swis\Laravel\LtiProvider\Models\Traits\IsLtiEnvironment;
  */
 class SimpleLtiEnvironment extends Model implements LtiEnvironment
 {
+    /** @use \Illuminate\Database\Eloquent\Factories\HasFactory<\Workbench\Database\Factories\Models\SimpleLtiEnvironmentFactory> */
     use HasFactory;
+
     use IsLtiEnvironment;
 
     protected $fillable = [

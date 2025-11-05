@@ -29,22 +29,22 @@ interface Client
     public function fillFromLtiPlatform(Platform $platform): void;
 
     /**
-     * @return HasMany<\Swis\Laravel\LtiProvider\Models\ResourceLink>
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Swis\Laravel\LtiProvider\Models\ResourceLink, $this&\Illuminate\Database\Eloquent\Model>
      */
     public function resourceLinks(): HasMany;
 
     /**
-     * @return HasMany<\Swis\Laravel\LtiProvider\Models\Context>
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Swis\Laravel\LtiProvider\Models\Context, $this&\Illuminate\Database\Eloquent\Model>
      */
     public function contexts(): HasMany;
 
     /**
-     * @return HasMany<\Swis\Laravel\LtiProvider\Models\Nonce>
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Swis\Laravel\LtiProvider\Models\Nonce, $this&\Illuminate\Database\Eloquent\Model>
      */
     public function nonces(): HasMany;
 
     /**
-     * @return HasMany<\Swis\Laravel\LtiProvider\Models\AccessToken>
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Swis\Laravel\LtiProvider\Models\AccessToken, $this&\Illuminate\Database\Eloquent\Model>
      */
     public function accessTokens(): HasMany;
 }

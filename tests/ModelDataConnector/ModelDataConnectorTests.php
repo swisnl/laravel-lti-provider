@@ -25,10 +25,8 @@ trait ModelDataConnectorTests
      */
     protected function createClient(array $attributes = []): Client&Model
     {
-        /** @var Client&Model $client */
-        $client = Factory::factoryForModel(config('lti-provider.class-names.client'))->create($attributes);
-
-        return $client;
+        /* @phpstan-ignore-next-line */
+        return Factory::factoryForModel(config('lti-provider.class-names.client'))->create($attributes);
     }
 
     #[Test]
@@ -688,7 +686,7 @@ trait ModelDataConnectorTests
         $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiContext = Context::fromPlatform($platform, $context->external_context_id);
         $ltiResourceLink = ResourceLink::fromContext($ltiContext, $resourceLink->external_resource_link_id);
-        $ltiUserResult = new UserResult();
+        $ltiUserResult = new UserResult;
         $ltiUserResult->setDataConnector($this->connector);
         $ltiUserResult->setResourceLinkId($ltiResourceLink->getRecordId());
         $ltiUserResult->ltiUserId = '456';

@@ -18,7 +18,7 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
  * @property int|null $lti_context_id
  * @property string|null $title
  * @property string $external_resource_link_id
- * @property \Illuminate\Database\Eloquent\Casts\ArrayObject $settings
+ * @property \Illuminate\Database\Eloquent\Casts\ArrayObject<string, mixed> $settings
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Swis\Laravel\LtiProvider\Models\Context|null $context
@@ -97,18 +97,20 @@ class ResourceLink extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Swis\Laravel\LtiProvider\Models\Context, self>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Swis\Laravel\LtiProvider\Models\Context, $this>
      */
     public function context(): BelongsTo
     {
+        /* @phpstan-ignore-next-line */
         return $this->belongsTo(config('lti-provider.class-names.context'), 'lti_context_id');
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Swis\Laravel\LtiProvider\Models\UserResult>
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Swis\Laravel\LtiProvider\Models\UserResult, $this>
      */
     public function userResults(): HasMany
     {
+        /* @phpstan-ignore-next-line */
         return $this->hasMany(config('lti-provider.class-names.user-result'), 'lti_resource_link_id');
     }
 }
