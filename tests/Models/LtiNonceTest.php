@@ -4,6 +4,7 @@ namespace Tests\Models;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Swis\Laravel\LtiProvider\Models\Nonce;
 use Swis\Laravel\LtiProvider\Models\SimpleClient;
 use Tests\TestCase;
@@ -13,7 +14,7 @@ class LtiNonceTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_should_delete_expired_nonces(): void
     {
         // Arrange

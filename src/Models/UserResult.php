@@ -61,10 +61,11 @@ class UserResult extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Swis\Laravel\LtiProvider\Models\ResourceLink, self>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Swis\Laravel\LtiProvider\Models\ResourceLink, $this>
      */
     public function resourceLink(): BelongsTo
     {
+        /* @phpstan-ignore-next-line */
         return $this->belongsTo(config('lti-provider.class-names.resource-link'), 'lti_resource_link_id');
     }
 }

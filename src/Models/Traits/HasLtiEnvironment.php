@@ -11,13 +11,13 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string $lti_environment_id
  * @property \Illuminate\Database\Eloquent\Model&\Swis\Laravel\LtiProvider\Models\Contracts\LtiEnvironment $ltiEnvironment
  *
- * @method static \Illuminate\Database\Eloquent\Builder|static whereLtiEnvironmentId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|static whereLtiEnvironmentType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|static whereLtiEnvironmentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|static whereLtiEnvironmentType($value)
  */
 trait HasLtiEnvironment
 {
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Illuminate\Database\Eloquent\Model&\Swis\Laravel\LtiProvider\Models\Contracts\LtiEnvironment,self>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Illuminate\Database\Eloquent\Model&\Swis\Laravel\LtiProvider\Models\Contracts\LtiEnvironment, $this>
      */
     public function ltiEnvironment(): MorphTo
     {

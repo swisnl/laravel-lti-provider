@@ -22,8 +22,8 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasClientCapabilities;
  * @property string|null $lti_deployment_id
  * @property string|null $lti_version
  * @property string $lti_signature_method
- * @property \Illuminate\Database\Eloquent\Casts\ArrayObject $lti_profile
- * @property \Illuminate\Database\Eloquent\Casts\ArrayObject $lti_settings
+ * @property \Illuminate\Database\Eloquent\Casts\ArrayObject<string, mixed> $lti_profile
+ * @property \Illuminate\Database\Eloquent\Casts\ArrayObject<string, mixed> $lti_settings
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  *

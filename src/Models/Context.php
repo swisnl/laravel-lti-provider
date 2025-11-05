@@ -16,7 +16,7 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
  * @property int $id
  * @property string|null $title
  * @property string $external_context_id
- * @property \Illuminate\Database\Eloquent\Casts\ArrayObject $settings
+ * @property \Illuminate\Database\Eloquent\Casts\ArrayObject<string, mixed> $settings
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Database\Eloquent\Collection<int, \Swis\Laravel\LtiProvider\Models\ResourceLink> $resourceLinks
@@ -80,10 +80,11 @@ class Context extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Swis\Laravel\LtiProvider\Models\ResourceLink>
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Swis\Laravel\LtiProvider\Models\ResourceLink, $this>
      */
     public function resourceLinks(): HasMany
     {
+        /* @phpstan-ignore-next-line */
         return $this->hasMany(config('lti-provider.class-names.resource-link'), 'lti_context_id');
     }
 }

@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Swis\Laravel\LtiProvider\Models\Contracts\Client;
 use Swis\Laravel\LtiProvider\Models\SimpleClient;
 
@@ -24,13 +25,11 @@ trait ModelDataConnectorTests
      */
     protected function createClient(array $attributes = []): Client&Model
     {
-        /** @var Client&Model $client */
-        $client = Factory::factoryForModel(config('lti-provider.class-names.client'))->create($attributes);
-
-        return $client;
+        /* @phpstan-ignore-next-line */
+        return Factory::factoryForModel(config('lti-provider.class-names.client'))->create($attributes);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_load_platform(): void
     {
         // Arrange
@@ -43,7 +42,7 @@ trait ModelDataConnectorTests
         $this->assertEquals($client->getAttribute('name'), $platform->name);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_update_platform(): void
     {
         // Arrange
@@ -65,7 +64,7 @@ trait ModelDataConnectorTests
         $this->assertEquals('b', $reloadedPlatform->getSetting('a'));
     }
 
-    /** @test */
+    #[Test]
     public function it_should_not_insert_platform(): void
     {
         // Arrange
@@ -79,7 +78,7 @@ trait ModelDataConnectorTests
         $this->assertEmpty(SimpleClient::all());
     }
 
-    /** @test */
+    #[Test]
     public function it_should_load_context_from_external_context_id(): void
     {
         // Arrange
@@ -99,7 +98,7 @@ trait ModelDataConnectorTests
         $this->assertEquals($ltiContext->getRecordId(), $context->id);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_insert_context(): void
     {
         // Arrange
@@ -116,7 +115,7 @@ trait ModelDataConnectorTests
         $this->assertCount(1, $contexts);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_update_context(): void
     {
         // Arrange
@@ -141,7 +140,7 @@ trait ModelDataConnectorTests
         $this->assertEquals('b', $context->settings['a']);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_delete_context(): void
     {
         // Arrange
@@ -164,7 +163,7 @@ trait ModelDataConnectorTests
         $context->refresh();
     }
 
-    /** @test */
+    #[Test]
     public function it_should_load_resource_link_from_record_id(): void
     {
         // Arrange
@@ -183,7 +182,7 @@ trait ModelDataConnectorTests
         $this->assertEquals($ltiResourceLink->ltiResourceLinkId, $resourceLink->external_resource_link_id);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_load_resource_link_from_external_resource_link_id_without_context(): void
     {
         // Arrange
@@ -203,7 +202,7 @@ trait ModelDataConnectorTests
         $this->assertEquals($ltiResourceLink->title, $resourceLink->title);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_insert_resource_link_without_context(): void
     {
         // Arrange
@@ -220,7 +219,7 @@ trait ModelDataConnectorTests
         $this->assertCount(1, $resourceLinks);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_load_resource_link_from_external_resource_link_id_with_context(): void
     {
         // Arrange
@@ -247,7 +246,7 @@ trait ModelDataConnectorTests
         $this->assertEquals($ltiResourceLink->title, $resourceLink->title);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_insert_resource_link_with_context(): void
     {
         // Arrange
@@ -274,7 +273,7 @@ trait ModelDataConnectorTests
         $this->assertCount(1, $clientResourceLinks);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_delete_resource_link(): void
     {
         // Arrange
@@ -297,7 +296,7 @@ trait ModelDataConnectorTests
         $resourceLink->refresh();
     }
 
-    /** @test */
+    #[Test]
     public function it_should_get_user_results_for_resource_link(): void
     {
         // Arrange
@@ -352,7 +351,7 @@ trait ModelDataConnectorTests
         $this->assertCount(1, $userResults2);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_never_return_shares_for_a_result_link(): void
     {
         // Arrange
@@ -381,7 +380,7 @@ trait ModelDataConnectorTests
         $this->assertCount(0, $shares);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_load_user_result_from_record_id(): void
     {
         // Arrange
@@ -405,7 +404,7 @@ trait ModelDataConnectorTests
         $this->assertEquals($ltiUserResult->ltiUserId, $userResult->external_user_id);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_load_nonce(): void
     {
         // Arrange
@@ -426,7 +425,7 @@ trait ModelDataConnectorTests
         $this->assertEquals($nonce->expires_at->getTimestamp(), $ltiNonce->expires);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_insert_nonce(): void
     {
         // Arrange
@@ -443,7 +442,7 @@ trait ModelDataConnectorTests
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_update_nonce(): void
     {
         // Arrange
@@ -465,7 +464,7 @@ trait ModelDataConnectorTests
         $this->assertGreaterThan(Carbon::now()->addMinutes(PlatformNonce::MAX_NONCE_AGE - 5), $nonce->expires_at);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_delete_nonce(): void
     {
         // Arrange
@@ -488,7 +487,7 @@ trait ModelDataConnectorTests
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_load_access_token(): void
     {
         // Arrange
@@ -509,7 +508,7 @@ trait ModelDataConnectorTests
         $this->assertEquals($ltiAccessToken->token, $accessToken->access_token);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_insert_access_token(): void
     {
         // Arrange
@@ -526,7 +525,7 @@ trait ModelDataConnectorTests
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_update_access_token(): void
     {
         // Arrange
@@ -549,7 +548,7 @@ trait ModelDataConnectorTests
         $this->assertEquals('456', $accessToken->access_token);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_never_load_resource_link_share_key(): void
     {
         // Arrange
@@ -579,7 +578,7 @@ trait ModelDataConnectorTests
         $this->assertFalse($ok);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_never_save_resource_link_share_key(): void
     {
         // Arrange
@@ -638,7 +637,7 @@ trait ModelDataConnectorTests
         $this->assertFalse($ok);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_load_user_result_from_user_id(): void
     {
         // Arrange
@@ -665,7 +664,7 @@ trait ModelDataConnectorTests
         $this->assertEquals($ltiUserResult->getRecordId(), $userResult->id);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_insert_user_result(): void
     {
         // Arrange
@@ -687,7 +686,7 @@ trait ModelDataConnectorTests
         $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
         $ltiContext = Context::fromPlatform($platform, $context->external_context_id);
         $ltiResourceLink = ResourceLink::fromContext($ltiContext, $resourceLink->external_resource_link_id);
-        $ltiUserResult = new UserResult();
+        $ltiUserResult = new UserResult;
         $ltiUserResult->setDataConnector($this->connector);
         $ltiUserResult->setResourceLinkId($ltiResourceLink->getRecordId());
         $ltiUserResult->ltiUserId = '456';
@@ -705,7 +704,7 @@ trait ModelDataConnectorTests
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_update_user_result(): void
     {
         // Arrange
@@ -747,7 +746,7 @@ trait ModelDataConnectorTests
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_delete_user_result(): void
     {
         // Arrange

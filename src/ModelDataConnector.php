@@ -28,7 +28,7 @@ class ModelDataConnector extends DataConnector
     protected LtiEnvironment $environment;
 
     /**
-     * @var class-string<Model&Client>
+     * @var class-string<\Illuminate\Database\Eloquent\Model&\Swis\Laravel\LtiProvider\Models\Contracts\Client>
      */
     protected string $clientClassName;
 
@@ -41,10 +41,11 @@ class ModelDataConnector extends DataConnector
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Builder<Model&Client>
+     * @return \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model&\Swis\Laravel\LtiProvider\Models\Contracts\Client>
      */
     protected function getClientBuilder(): Builder
     {
+        /* @phpstan-ignore-next-line */
         return $this->clientClassName::query();
     }
 
@@ -354,7 +355,7 @@ class ModelDataConnector extends DataConnector
 
         /** @var Collection<int,CelticUserResult> $userResults */
         $userResults = $userResultModels->map(function (UserResult $userResultModel) use ($resourceLink): CelticUserResult {
-            $userResult = new CelticUserResult();
+            $userResult = new CelticUserResult;
 
             $userResult->setDataConnector($this);
             $userResult->setResourceLinkId($resourceLink->getRecordId());
