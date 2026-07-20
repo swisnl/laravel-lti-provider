@@ -17,22 +17,9 @@ jobs:
         stability: [prefer-lowest, prefer-stable]
         include:
           - laravel: 12.*
-            testbench: ^9.1
-            phpstan: 1.*
-            larastan: 2.*
-          - laravel: 12.*
-            testbench: ^9.1
-            phpstan: 1.*
-            larastan: 2.*
+            testbench: 10.*
           - laravel: 13.*
-            testbench: ^10.0
-            phpstan: 2.*
-            larastan: 3.*
-          - laravel: 13.*
-            testbench: ^10.0
-            phpstan: 2.*
-            larastan: 3.*
-
+            testbench: 11.*
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
     steps:
@@ -53,7 +40,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require --dev "orchestra/testbench:${{ matrix.testbench }}" "larastan/larastan:${{ matrix.larastan }}" "phpstan/phpstan:${{ matrix.phpstan }}" "phpstan/phpstan-deprecation-rules:${{ matrix.phpstan }}" "phpstan/phpstan-phpunit:${{ matrix.phpstan }}" --no-interaction --no-update
+          composer require --dev "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
           composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
