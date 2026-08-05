@@ -13,9 +13,9 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 /**
  * @property string $id
  * @property string $nonce
- * @property \Illuminate\Support\Carbon $expires_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon $expires_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Nonce newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Nonce newQuery()

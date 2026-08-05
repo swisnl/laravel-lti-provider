@@ -1,12 +1,19 @@
 <?php
 
+use Swis\Laravel\LtiProvider\Models\AccessToken;
+use Swis\Laravel\LtiProvider\Models\Context;
+use Swis\Laravel\LtiProvider\Models\Nonce;
+use Swis\Laravel\LtiProvider\Models\ResourceLink;
+use Swis\Laravel\LtiProvider\Models\SimpleClient;
+use Swis\Laravel\LtiProvider\Models\UserResult;
+
 return [
     'class-names' => [
-        'client' => \Swis\Laravel\LtiProvider\Models\SimpleClient::class,
-        'context' => \Swis\Laravel\LtiProvider\Models\Context::class,
-        'resource-link' => \Swis\Laravel\LtiProvider\Models\ResourceLink::class,
-        'nonce' => \Swis\Laravel\LtiProvider\Models\Nonce::class,
-        'user-result' => \Swis\Laravel\LtiProvider\Models\UserResult::class,
-        'access-token' => \Swis\Laravel\LtiProvider\Models\AccessToken::class,
+        'client' => SimpleClient::class,
+        'context' => Context::class,
+        'resource-link' => ResourceLink::class,
+        'nonce' => Nonce::class,
+        'user-result' => UserResult::class,
+        'access-token' => AccessToken::class,
     ],
 ];

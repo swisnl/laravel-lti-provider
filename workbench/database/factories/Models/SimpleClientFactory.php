@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 use Swis\Laravel\LtiProvider\Models\SimpleClient;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Swis\Laravel\LtiProvider\Models\SimpleClient>
+ * @extends Factory<SimpleClient>
  */
 class SimpleClientFactory extends Factory
 {

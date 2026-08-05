@@ -5,7 +5,12 @@ declare(strict_types=1);
 namespace Swis\Laravel\LtiProvider\Models\Contracts;
 
 use ceLTIc\LTI\Platform;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Swis\Laravel\LtiProvider\Models\AccessToken;
+use Swis\Laravel\LtiProvider\Models\Context;
+use Swis\Laravel\LtiProvider\Models\Nonce;
+use Swis\Laravel\LtiProvider\Models\ResourceLink;
 
 /**
  * @property int $nr
@@ -29,22 +34,22 @@ interface Client
     public function fillFromLtiPlatform(Platform $platform): void;
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Swis\Laravel\LtiProvider\Models\ResourceLink, $this&\Illuminate\Database\Eloquent\Model>
+     * @return HasMany<ResourceLink, $this&Model>
      */
     public function resourceLinks(): HasMany;
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Swis\Laravel\LtiProvider\Models\Context, $this&\Illuminate\Database\Eloquent\Model>
+     * @return HasMany<Context, $this&Model>
      */
     public function contexts(): HasMany;
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Swis\Laravel\LtiProvider\Models\Nonce, $this&\Illuminate\Database\Eloquent\Model>
+     * @return HasMany<Nonce, $this&Model>
      */
     public function nonces(): HasMany;
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Swis\Laravel\LtiProvider\Models\AccessToken, $this&\Illuminate\Database\Eloquent\Model>
+     * @return HasMany<AccessToken, $this&Model>
      */
     public function accessTokens(): HasMany;
 }

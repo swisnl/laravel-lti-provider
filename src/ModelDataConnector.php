@@ -8,6 +8,7 @@ use ceLTIc\LTI\AccessToken as CelticAccessToken;
 use ceLTIc\LTI\Context as CelticContext;
 use ceLTIc\LTI\DataConnector\DataConnector;
 use ceLTIc\LTI\Enum\IdScope;
+use ceLTIc\LTI\Platform;
 use ceLTIc\LTI\Platform as CelticPlatform;
 use ceLTIc\LTI\PlatformNonce as CelticNonce;
 use ceLTIc\LTI\ResourceLink as CelticResourceLink;
@@ -18,8 +19,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Swis\Laravel\LtiProvider\Models\AccessToken;
+use Swis\Laravel\LtiProvider\Models\Context;
 use Swis\Laravel\LtiProvider\Models\Contracts\Client;
 use Swis\Laravel\LtiProvider\Models\Contracts\LtiEnvironment;
+use Swis\Laravel\LtiProvider\Models\Nonce;
+use Swis\Laravel\LtiProvider\Models\ResourceLink;
 use Swis\Laravel\LtiProvider\Models\UserResult;
 
 /** @phpstan-consistent-constructor */
@@ -28,7 +33,7 @@ class ModelDataConnector extends DataConnector
     protected LtiEnvironment $environment;
 
     /**
-     * @var class-string<\Illuminate\Database\Eloquent\Model&\Swis\Laravel\LtiProvider\Models\Contracts\Client>
+     * @var class-string<Model&Client>
      */
     protected string $clientClassName;
 
@@ -41,7 +46,7 @@ class ModelDataConnector extends DataConnector
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model&\Swis\Laravel\LtiProvider\Models\Contracts\Client>
+     * @return Builder<Model&Client>
      */
     protected function getClientBuilder(): Builder
     {
@@ -145,7 +150,7 @@ class ModelDataConnector extends DataConnector
     }
 
     /**
-     * @return \ceLTIc\LTI\Platform[]
+     * @return Platform[]
      */
     public function getPlatforms(): array
     {
@@ -161,7 +166,7 @@ class ModelDataConnector extends DataConnector
     public function loadContext(CelticContext $context): bool
     {
         if (! empty($context->getRecordId())) {
-            /** @var \Swis\Laravel\LtiProvider\Models\Context|null $contextModel */
+            /** @var Context|null $contextModel */
             $contextModel = $this->environment->contexts()
                 ->with('client')
                 ->find($context->getRecordId());
@@ -175,7 +180,7 @@ class ModelDataConnector extends DataConnector
         }
 
         if (! empty($context->ltiContextId)) {
-            /** @var \Swis\Laravel\LtiProvider\Models\Context|null $contextModel */
+            /** @var Context|null $contextModel */
             $contextModel = $this->environment->contexts()
                 ->with('client')
                 ->where('external_context_id', $context->ltiContextId)
@@ -196,7 +201,7 @@ class ModelDataConnector extends DataConnector
     public function saveContext(CelticContext $context): bool
     {
         if (! empty($context->getRecordId())) {
-            /** @var \Swis\Laravel\LtiProvider\Models\Context|null $contextModel */
+            /** @var Context|null $contextModel */
             $contextModel = $this->environment->contexts()->find($context->getRecordId());
             if (! $contextModel) {
                 return false;
@@ -205,7 +210,7 @@ class ModelDataConnector extends DataConnector
             $contextModel->fillFromLtiContext($context);
             $contextModel->save();
         } else {
-            /** @var \Swis\Laravel\LtiProvider\Models\Context|null $contextModel */
+            /** @var Context|null $contextModel */
             $contextModel = $this->environment->contexts()->make();
             $contextModel->fillFromLtiContext($context);
             $contextModel->save();
@@ -222,7 +227,7 @@ class ModelDataConnector extends DataConnector
     public function deleteContext(CelticContext $context): bool
     {
         if (! empty($context->getRecordId())) {
-            /** @var \Swis\Laravel\LtiProvider\Models\Context|null $contextModel */
+            /** @var Context|null $contextModel */
             $contextModel = $this->environment->contexts()->find($context->getRecordId());
             if (! $contextModel) {
                 return false;
@@ -239,7 +244,7 @@ class ModelDataConnector extends DataConnector
     public function loadResourceLink(CelticResourceLink $resourceLink): bool
     {
         if (! empty($resourceLink->getRecordId())) {
-            /** @var \Swis\Laravel\LtiProvider\Models\ResourceLink|null $resourceLinkModel */
+            /** @var ResourceLink|null $resourceLinkModel */
             $resourceLinkModel = $this->environment->resourceLinks()
                 ->with('client')
                 ->find($resourceLink->getRecordId());
@@ -253,7 +258,7 @@ class ModelDataConnector extends DataConnector
         }
 
         if (! empty($resourceLink->getContext())) {
-            /** @var \Swis\Laravel\LtiProvider\Models\ResourceLink|null $resourceLinkModel */
+            /** @var ResourceLink|null $resourceLinkModel */
             $resourceLinkModel = $this->environment->resourceLinks()
                 ->with('client')
                 ->where('external_resource_link_id', $resourceLink->ltiResourceLinkId)
@@ -277,7 +282,7 @@ class ModelDataConnector extends DataConnector
             return true;
         }
 
-        /** @var \Swis\Laravel\LtiProvider\Models\ResourceLink|null $resourceLinkModel */
+        /** @var ResourceLink|null $resourceLinkModel */
         $resourceLinkModel = $this->environment->resourceLinks()
             ->with('client')
             ->where('external_resource_link_id', $resourceLink->ltiResourceLinkId)
@@ -301,7 +306,7 @@ class ModelDataConnector extends DataConnector
     public function saveResourceLink(CelticResourceLink $resourceLink): bool
     {
         if (! empty($resourceLink->getRecordId())) {
-            /** @var \Swis\Laravel\LtiProvider\Models\ResourceLink|null $resourceLinkModel */
+            /** @var ResourceLink|null $resourceLinkModel */
             $resourceLinkModel = $this->environment->resourceLinks()->find($resourceLink->getRecordId());
             if (! $resourceLinkModel) {
                 return false;
@@ -310,7 +315,7 @@ class ModelDataConnector extends DataConnector
             $resourceLinkModel->fillFromLtiResourceLink($resourceLink);
             $resourceLinkModel->save();
         } else {
-            /** @var \Swis\Laravel\LtiProvider\Models\ResourceLink|null $resourceLinkModel */
+            /** @var ResourceLink|null $resourceLinkModel */
             $resourceLinkModel = $this->environment->resourceLinks()->make();
             $resourceLinkModel->fillFromLtiResourceLink($resourceLink);
             $resourceLinkModel->save();
@@ -327,7 +332,7 @@ class ModelDataConnector extends DataConnector
     public function deleteResourceLink(CelticResourceLink $resourceLink): bool
     {
         if (! empty($resourceLink->getRecordId())) {
-            /** @var \Swis\Laravel\LtiProvider\Models\ResourceLink|null $resourceLinkModel */
+            /** @var ResourceLink|null $resourceLinkModel */
             $resourceLinkModel = $this->environment->resourceLinks()->find($resourceLink->getRecordId());
             if (! $resourceLinkModel) {
                 return false;
@@ -343,7 +348,7 @@ class ModelDataConnector extends DataConnector
     }
 
     /**
-     * @return \ceLTIc\LTI\UserResult[]
+     * @return CelticUserResult[]
      */
     public function getUserResultSourcedIDsResourceLink(CelticResourceLink $resourceLink, bool $localOnly, ?IdScope $idScope): array
     {
@@ -386,7 +391,7 @@ class ModelDataConnector extends DataConnector
             return parent::loadPlatformNonce($nonce);
         }
 
-        /** @var \Swis\Laravel\LtiProvider\Models\Nonce|null $nonceModel */
+        /** @var Nonce|null $nonceModel */
         $nonceModel = $this->environment->nonces()
             ->where('client_id', $this->getClientForeignKeyFromPlatform($nonce->getPlatform()))
             ->where('nonce', $nonce->getValue())
@@ -408,7 +413,7 @@ class ModelDataConnector extends DataConnector
             return parent::savePlatformNonce($nonce);
         }
 
-        /** @var \Swis\Laravel\LtiProvider\Models\Nonce $nonceModel */
+        /** @var Nonce $nonceModel */
         $nonceModel = $this->environment->nonces()->firstOrNew([
             'client_id' => $this->getClientForeignKeyFromPlatform($nonce->getPlatform()),
             'nonce' => $nonce->getValue(),
@@ -440,7 +445,7 @@ class ModelDataConnector extends DataConnector
             return parent::loadAccessToken($accessToken);
         }
 
-        /** @var \Swis\Laravel\LtiProvider\Models\AccessToken|null $accessTokenModel */
+        /** @var AccessToken|null $accessTokenModel */
         $accessTokenModel = $this->environment->accessTokens()
             ->where('client_id', $this->getClientForeignKeyFromPlatform($accessToken->getPlatform()))
             ->first();
@@ -459,7 +464,7 @@ class ModelDataConnector extends DataConnector
             return parent::saveAccessToken($accessToken);
         }
 
-        /** @var \Swis\Laravel\LtiProvider\Models\AccessToken $accessTokenModel */
+        /** @var AccessToken $accessTokenModel */
         $accessTokenModel = $this->environment->accessTokens()->firstOrNew([
             'client_id' => $this->getClientForeignKeyFromPlatform($accessToken->getPlatform()),
         ]);
@@ -487,7 +492,7 @@ class ModelDataConnector extends DataConnector
     public function loadUserResult(CelticUserResult $userResult): bool
     {
         if (! empty($userResult->getRecordId())) {
-            /** @var \Swis\Laravel\LtiProvider\Models\UserResult|null $userResultModel */
+            /** @var UserResult|null $userResultModel */
             $userResultModel = $this->environment->userResults()->find($userResult->getRecordId());
             if (! $userResultModel) {
                 return false;
@@ -498,7 +503,7 @@ class ModelDataConnector extends DataConnector
             return true;
         }
 
-        /** @var \Swis\Laravel\LtiProvider\Models\UserResult|null $userResultModel */
+        /** @var UserResult|null $userResultModel */
         $userResultModel = $this->environment->userResults()
             ->where('lti_resource_link_id', $userResult->getResourceLink()->getRecordId())
             ->where('external_user_id', $userResult->getId(IdScope::IdOnly))
@@ -515,7 +520,7 @@ class ModelDataConnector extends DataConnector
     public function saveUserResult(CelticUserResult $userResult): bool
     {
         if (is_null($userResult->created)) {
-            /** @var \Swis\Laravel\LtiProvider\Models\UserResult $userResultModel */
+            /** @var UserResult $userResultModel */
             $userResultModel = $this->environment->userResults()->make();
             $userResultModel->fillFromLtiUserResult($userResult);
             $userResultModel->save();
@@ -527,7 +532,7 @@ class ModelDataConnector extends DataConnector
             return true;
         }
 
-        /** @var \Swis\Laravel\LtiProvider\Models\UserResult|null $userResultModel */
+        /** @var UserResult|null $userResultModel */
         $userResultModel = $this->environment->userResults()->find($userResult->getRecordId());
         if (! $userResultModel) {
             return false;
@@ -543,7 +548,7 @@ class ModelDataConnector extends DataConnector
 
     public function deleteUserResult(CelticUserResult $userResult): bool
     {
-        /** @var \Swis\Laravel\LtiProvider\Models\UserResult|null $userResultModel */
+        /** @var UserResult|null $userResultModel */
         $userResultModel = $this->environment->userResults()->find($userResult->getRecordId());
         if (! $userResultModel) {
             return false;
@@ -570,7 +575,7 @@ class ModelDataConnector extends DataConnector
     }
 
     /**
-     * @return \ceLTIc\LTI\Tool[]
+     * @return Tool[]
      */
     public function getTools(): array
     {

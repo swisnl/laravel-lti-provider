@@ -6,11 +6,16 @@ namespace Swis\Laravel\LtiProvider\Models\Traits;
 
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Swis\Laravel\LtiProvider\ModelDataConnector;
+use Swis\Laravel\LtiProvider\Models\AccessToken;
+use Swis\Laravel\LtiProvider\Models\Context;
+use Swis\Laravel\LtiProvider\Models\Nonce;
+use Swis\Laravel\LtiProvider\Models\ResourceLink;
+use Swis\Laravel\LtiProvider\Models\UserResult;
 
 trait IsLtiEnvironment
 {
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Swis\Laravel\LtiProvider\Models\AccessToken, $this>
+     * @return MorphMany<AccessToken, $this>
      */
     public function accessTokens(): MorphMany
     {
@@ -19,7 +24,7 @@ trait IsLtiEnvironment
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Swis\Laravel\LtiProvider\Models\Context, $this>
+     * @return MorphMany<Context, $this>
      */
     public function contexts(): MorphMany
     {
@@ -28,7 +33,7 @@ trait IsLtiEnvironment
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Swis\Laravel\LtiProvider\Models\Nonce, $this>
+     * @return MorphMany<Nonce, $this>
      */
     public function nonces(): MorphMany
     {
@@ -37,7 +42,7 @@ trait IsLtiEnvironment
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Swis\Laravel\LtiProvider\Models\ResourceLink, $this>
+     * @return MorphMany<ResourceLink, $this>
      */
     public function resourceLinks(): MorphMany
     {
@@ -46,7 +51,7 @@ trait IsLtiEnvironment
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Swis\Laravel\LtiProvider\Models\UserResult, $this>
+     * @return MorphMany<UserResult, $this>
      */
     public function userResults(): MorphMany
     {

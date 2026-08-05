@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 use Workbench\App\OverrideModels\Client;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Workbench\App\OverrideModels\Client>
+ * @extends Factory<Client>
  */
 class ClientFactory extends Factory
 {

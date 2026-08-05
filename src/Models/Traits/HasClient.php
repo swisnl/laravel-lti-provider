@@ -2,18 +2,20 @@
 
 namespace Swis\Laravel\LtiProvider\Models\Traits;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Swis\Laravel\LtiProvider\Models\Contracts\Client;
 
 /**
  * @property string|int $client_id
- * @property \Illuminate\Database\Eloquent\Model&\Swis\Laravel\LtiProvider\Models\Contracts\Client $client
+ * @property Model&Client $client
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|static whereClientId($value)
  */
 trait HasClient
 {
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Illuminate\Database\Eloquent\Model&\Swis\Laravel\LtiProvider\Models\Contracts\Client, $this>
+     * @return BelongsTo<Model&Client, $this>
      */
     public function client(): BelongsTo
     {

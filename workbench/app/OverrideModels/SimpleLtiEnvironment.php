@@ -5,15 +5,17 @@ namespace Workbench\App\OverrideModels;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Swis\Laravel\LtiProvider\Models\Contracts\LtiEnvironment;
 use Swis\Laravel\LtiProvider\Models\SimpleClient;
 use Swis\Laravel\LtiProvider\Models\Traits\IsLtiEnvironment;
+use Workbench\Database\Factories\Models\SimpleLtiEnvironmentFactory;
 
 /**
  * @property string $id
  * @property string $name
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  *
  * @method static \Illuminate\Database\Eloquent\Builder|SimpleClient newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|SimpleClient newQuery()
@@ -25,7 +27,7 @@ use Swis\Laravel\LtiProvider\Models\Traits\IsLtiEnvironment;
  */
 class SimpleLtiEnvironment extends Model implements LtiEnvironment
 {
-    /** @use \Illuminate\Database\Eloquent\Factories\HasFactory<\Workbench\Database\Factories\Models\SimpleLtiEnvironmentFactory> */
+    /** @use HasFactory<SimpleLtiEnvironmentFactory> */
     use HasFactory;
 
     use HasUuids;

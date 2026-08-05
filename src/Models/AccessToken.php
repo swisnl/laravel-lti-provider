@@ -14,9 +14,9 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
  * @property string $id
  * @property string $access_token
  * @property array<array-key, string> $scopes
- * @property \Illuminate\Support\Carbon $expires_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon $expires_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  *
  * @method static \Illuminate\Database\Eloquent\Builder|AccessToken newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|AccessToken newQuery()

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Workbench\App\OverrideModels\SimpleLtiEnvironment;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Workbench\App\OverrideModels\SimpleLtiEnvironment>
+ * @extends Factory<SimpleLtiEnvironment>
  */
 class SimpleLtiEnvironmentFactory extends Factory
 {

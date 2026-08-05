@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace Swis\Laravel\LtiProvider\Models\Traits;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Swis\Laravel\LtiProvider\Models\AccessToken;
+use Swis\Laravel\LtiProvider\Models\Context;
+use Swis\Laravel\LtiProvider\Models\Nonce;
+use Swis\Laravel\LtiProvider\Models\ResourceLink;
 
 trait HasClientCapabilities
 {
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Swis\Laravel\LtiProvider\Models\Context, $this>
+     * @return HasMany<Context, $this>
      */
     public function contexts(): HasMany
     {
@@ -18,7 +22,7 @@ trait HasClientCapabilities
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Swis\Laravel\LtiProvider\Models\ResourceLink, $this>
+     * @return HasMany<ResourceLink, $this>
      */
     public function resourceLinks(): HasMany
     {
@@ -27,7 +31,7 @@ trait HasClientCapabilities
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Swis\Laravel\LtiProvider\Models\Nonce, $this>
+     * @return HasMany<Nonce, $this>
      */
     public function nonces(): HasMany
     {
@@ -36,7 +40,7 @@ trait HasClientCapabilities
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Swis\Laravel\LtiProvider\Models\AccessToken, $this>
+     * @return HasMany<AccessToken, $this>
      */
     public function accessTokens(): HasMany
     {

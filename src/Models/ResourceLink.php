@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 use Swis\Laravel\LtiProvider\Models\Traits\HasClient;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 
@@ -18,10 +19,10 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
  * @property int|null $lti_context_id
  * @property string|null $title
  * @property string $external_resource_link_id
- * @property \Illuminate\Database\Eloquent\Casts\ArrayObject<string, mixed> $settings
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Swis\Laravel\LtiProvider\Models\Context|null $context
+ * @property ArrayObject<string, mixed> $settings
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Context|null $context
  * @property int|null $user_results_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder|ResourceLink newModelQuery()
@@ -97,7 +98,7 @@ class ResourceLink extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Swis\Laravel\LtiProvider\Models\Context, $this>
+     * @return BelongsTo<Context, $this>
      */
     public function context(): BelongsTo
     {
@@ -106,7 +107,7 @@ class ResourceLink extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Swis\Laravel\LtiProvider\Models\UserResult, $this>
+     * @return HasMany<UserResult, $this>
      */
     public function userResults(): HasMany
     {

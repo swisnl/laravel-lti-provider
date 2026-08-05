@@ -6,6 +6,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Swis\Laravel\LtiProvider\ModelDataConnector;
 use Swis\Laravel\LtiProvider\Models\Contracts\LtiEnvironment;
 use Tests\TestCase;
+use Workbench\App\OverrideModels\AccessToken;
+use Workbench\App\OverrideModels\Client;
+use Workbench\App\OverrideModels\Nonce;
 use Workbench\App\OverrideModels\SimpleLtiEnvironment;
 
 use function Orchestra\Testbench\workbench_path;
@@ -38,8 +41,8 @@ class OverrideModelDataConnectorTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        config()->set('lti-provider.class-names.client', \Workbench\App\OverrideModels\Client::class);
-        config()->set('lti-provider.class-names.access-token', \Workbench\App\OverrideModels\AccessToken::class);
-        config()->set('lti-provider.class-names.nonce', \Workbench\App\OverrideModels\Nonce::class);
+        config()->set('lti-provider.class-names.client', Client::class);
+        config()->set('lti-provider.class-names.access-token', AccessToken::class);
+        config()->set('lti-provider.class-names.nonce', Nonce::class);
     }
 }

@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Swis\Laravel\LtiProvider\Models\Traits;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Swis\Laravel\LtiProvider\Models\Contracts\LtiEnvironment;
 
 /**
  * @property string $lti_environment_type
  * @property string $lti_environment_id
- * @property \Illuminate\Database\Eloquent\Model&\Swis\Laravel\LtiProvider\Models\Contracts\LtiEnvironment $ltiEnvironment
+ * @property Model&LtiEnvironment $ltiEnvironment
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|static whereLtiEnvironmentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|static whereLtiEnvironmentType($value)
@@ -17,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 trait HasLtiEnvironment
 {
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo<\Illuminate\Database\Eloquent\Model&\Swis\Laravel\LtiProvider\Models\Contracts\LtiEnvironment, $this>
+     * @return MorphTo<Model&LtiEnvironment, $this>
      */
     public function ltiEnvironment(): MorphTo
     {

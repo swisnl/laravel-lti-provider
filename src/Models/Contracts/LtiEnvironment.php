@@ -4,30 +4,38 @@ declare(strict_types=1);
 
 namespace Swis\Laravel\LtiProvider\Models\Contracts;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Swis\Laravel\LtiProvider\Models\AccessToken;
+use Swis\Laravel\LtiProvider\Models\Context;
+use Swis\Laravel\LtiProvider\Models\Nonce;
+use Swis\Laravel\LtiProvider\Models\ResourceLink;
+use Swis\Laravel\LtiProvider\Models\UserResult;
+
 interface LtiEnvironment
 {
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Swis\Laravel\LtiProvider\Models\AccessToken, $this&\Illuminate\Database\Eloquent\Model>
+     * @return MorphMany<AccessToken, $this&Model>
      */
-    public function accessTokens(): \Illuminate\Database\Eloquent\Relations\MorphMany;
+    public function accessTokens(): MorphMany;
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Swis\Laravel\LtiProvider\Models\Context, $this&\Illuminate\Database\Eloquent\Model>
+     * @return MorphMany<Context, $this&Model>
      */
-    public function contexts(): \Illuminate\Database\Eloquent\Relations\MorphMany;
+    public function contexts(): MorphMany;
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Swis\Laravel\LtiProvider\Models\Nonce, $this&\Illuminate\Database\Eloquent\Model>
+     * @return MorphMany<Nonce, $this&Model>
      */
-    public function nonces(): \Illuminate\Database\Eloquent\Relations\MorphMany;
+    public function nonces(): MorphMany;
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Swis\Laravel\LtiProvider\Models\ResourceLink, $this&\Illuminate\Database\Eloquent\Model>
+     * @return MorphMany<ResourceLink, $this&Model>
      */
-    public function resourceLinks(): \Illuminate\Database\Eloquent\Relations\MorphMany;
+    public function resourceLinks(): MorphMany;
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Swis\Laravel\LtiProvider\Models\UserResult, $this&\Illuminate\Database\Eloquent\Model>
+     * @return MorphMany<UserResult, $this&Model>
      */
-    public function userResults(): \Illuminate\Database\Eloquent\Relations\MorphMany;
+    public function userResults(): MorphMany;
 }

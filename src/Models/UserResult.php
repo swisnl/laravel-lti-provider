@@ -8,6 +8,7 @@ use ceLTIc\LTI\Enum\IdScope;
 use ceLTIc\LTI\UserResult as CelticUserResult;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 
 /**
@@ -15,9 +16,9 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
  * @property int $lti_resource_link_id
  * @property string $external_user_id
  * @property string $external_user_result_id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Swis\Laravel\LtiProvider\Models\ResourceLink $resourceLink
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property ResourceLink $resourceLink
  *
  * @method static \Illuminate\Database\Eloquent\Builder|UserResult newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|UserResult newQuery()
@@ -61,7 +62,7 @@ class UserResult extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\Swis\Laravel\LtiProvider\Models\ResourceLink, $this>
+     * @return BelongsTo<ResourceLink, $this>
      */
     public function resourceLink(): BelongsTo
     {

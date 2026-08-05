@@ -7,8 +7,10 @@ namespace Swis\Laravel\LtiProvider\Models;
 use ceLTIc\LTI\Context as CelticContext;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 use Swis\Laravel\LtiProvider\Models\Traits\HasClient;
 use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
 
@@ -16,10 +18,10 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasLtiEnvironment;
  * @property int $id
  * @property string|null $title
  * @property string $external_context_id
- * @property \Illuminate\Database\Eloquent\Casts\ArrayObject<string, mixed> $settings
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Database\Eloquent\Collection<int, \Swis\Laravel\LtiProvider\Models\ResourceLink> $resourceLinks
+ * @property ArrayObject<string, mixed> $settings
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Collection<int, ResourceLink> $resourceLinks
  * @property int|null $resource_links_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Context newModelQuery()
@@ -80,7 +82,7 @@ class Context extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\Swis\Laravel\LtiProvider\Models\ResourceLink, $this>
+     * @return HasMany<ResourceLink, $this>
      */
     public function resourceLinks(): HasMany
     {

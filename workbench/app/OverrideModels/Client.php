@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Swis\Laravel\LtiProvider\Models\Contracts\Client as ClientContract;
 use Swis\Laravel\LtiProvider\Models\Traits\HasClientCapabilities;
@@ -22,10 +23,10 @@ use Swis\Laravel\LtiProvider\Models\Traits\HasClientCapabilities;
  * @property string|null $lti_deployment_id
  * @property string|null $lti_version
  * @property string $lti_signature_method
- * @property \Illuminate\Database\Eloquent\Casts\ArrayObject<string, mixed> $lti_profile
- * @property \Illuminate\Database\Eloquent\Casts\ArrayObject<string, mixed> $lti_settings
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property ArrayObject<string, mixed> $lti_profile
+ * @property ArrayObject<string, mixed> $lti_settings
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Client newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Client newQuery()
