@@ -402,6 +402,8 @@ trait ModelDataConnectorTests
 
         // Assert
         $this->assertEquals($ltiUserResult->ltiUserId, $userResult->external_user_id);
+        $this->assertEquals($ltiUserResult->created, $userResult->created_at->getTimestamp());
+        $this->assertEquals($ltiUserResult->updated, $userResult->updated_at->getTimestamp());
     }
 
     #[Test]
@@ -662,6 +664,7 @@ trait ModelDataConnectorTests
 
         // Assert
         $this->assertEquals($ltiUserResult->getRecordId(), $userResult->id);
+        $this->assertEquals($ltiUserResult->created, $userResult->created_at->getTimestamp());
     }
 
     #[Test]
@@ -738,11 +741,47 @@ trait ModelDataConnectorTests
         $ltiUserResult->save();
 
         // Assert
+        $this->assertEquals($ltiUserResult->getRecordId(), $userResult->id);
+        $this->assertDatabaseCount('lti_user_results', 1);
         $this->assertDatabaseHas('lti_user_results', [
-            'id' => $ltiUserResult->getRecordId(),
+            'id' => $userResult->id,
             'external_user_result_id' => '789',
             'external_user_id' => '456',
             'lti_resource_link_id' => $ltiResourceLink->getRecordId(),
+        ]);
+    }
+
+    #[Test]
+    public function it_should_not_duplicate_user_result_when_sourced_id_changes_between_launches(): void
+    {
+        // Arrange
+        $client = $this->createClient();
+
+        $resourceLink = $this->ltiEnvironment->resourceLinks()->create([
+            'client_id' => $client->getKey(),
+            'external_resource_link_id' => '123',
+            'title' => 'Barfoo',
+        ]);
+
+        $platform = Platform::fromRecordId($client->getLtiRecordId(), $this->connector);
+        $ltiResourceLink = ResourceLink::fromPlatform($platform, $resourceLink->external_resource_link_id);
+
+        // Act: the platform issues a new sourced id on every launch
+        $firstLaunchUserResult = UserResult::fromResourceLink($ltiResourceLink, '456');
+        $firstLaunchUserResult->ltiResultSourcedId = '123';
+        $firstLaunchUserResult->save();
+
+        $secondLaunchUserResult = UserResult::fromResourceLink($ltiResourceLink, '456');
+        $secondLaunchUserResult->ltiResultSourcedId = '789';
+        $secondLaunchUserResult->save();
+
+        // Assert
+        $this->assertEquals($firstLaunchUserResult->getRecordId(), $secondLaunchUserResult->getRecordId());
+        $this->assertDatabaseCount('lti_user_results', 1);
+        $this->assertDatabaseHas('lti_user_results', [
+            'id' => $firstLaunchUserResult->getRecordId(),
+            'external_user_result_id' => '789',
+            'external_user_id' => '456',
         ]);
     }
 

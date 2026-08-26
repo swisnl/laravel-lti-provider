@@ -519,7 +519,16 @@ class ModelDataConnector extends DataConnector
 
     public function saveUserResult(CelticUserResult $userResult): bool
     {
-        if (is_null($userResult->created)) {
+        if (! empty($userResult->getRecordId())) {
+            /** @var UserResult|null $userResultModel */
+            $userResultModel = $this->environment->userResults()->find($userResult->getRecordId());
+            if (! $userResultModel) {
+                return false;
+            }
+
+            $userResultModel->fillFromLtiUserResult($userResult);
+            $userResultModel->save();
+        } else {
             /** @var UserResult $userResultModel */
             $userResultModel = $this->environment->userResults()->make();
             $userResultModel->fillFromLtiUserResult($userResult);
@@ -527,19 +536,7 @@ class ModelDataConnector extends DataConnector
 
             $userResult->setRecordId($userResultModel->id);
             $userResult->created = $userResultModel->created_at->getTimestamp();
-            $userResult->updated = $userResultModel->updated_at->getTimestamp();
-
-            return true;
         }
-
-        /** @var UserResult|null $userResultModel */
-        $userResultModel = $this->environment->userResults()->find($userResult->getRecordId());
-        if (! $userResultModel) {
-            return false;
-        }
-
-        $userResultModel->fillFromLtiUserResult($userResult);
-        $userResultModel->save();
 
         $userResult->updated = $userResultModel->updated_at->getTimestamp();
 

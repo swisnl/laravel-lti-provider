@@ -52,6 +52,8 @@ class UserResult extends Model
 
         $userResult->ltiUserId = $this->external_user_id;
         $userResult->ltiResultSourcedId = $this->external_user_result_id;
+        $userResult->created = $this->created_at?->getTimestamp();
+        $userResult->updated = $this->updated_at?->getTimestamp();
     }
 
     public function fillFromLtiUserResult(CelticUserResult $userResult): void
