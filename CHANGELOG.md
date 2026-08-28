@@ -13,7 +13,7 @@ Updates should follow the [Keep a CHANGELOG](https://keepachangelog.com/) princi
 - Nothing
 
 ### Fixed
-- Nothing
+- Saving a loaded user result created a duplicate `lti_user_results` record instead of updating the existing one, e.g. when a platform issues a new `lis_result_sourcedid` on every launch. `saveUserResult()` now decides between insert and update based on the record id (consistent with the other save methods) and loaded user results now expose their `created`/`updated` timestamps.
 
 ### Removed
 - Nothing
